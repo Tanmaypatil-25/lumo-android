@@ -3,27 +3,24 @@ package com.tanmay.lumo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.tanmay.lumo.data.remote.RetrofitClient
 import com.tanmay.lumo.ui.theme.LumoTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContent {
             LumoTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    StatusScreen()
                 }
             }
         }
@@ -31,17 +28,49 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun StatusScreen() {
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    LumoTheme {
-        Greeting("Android")
+    var status by remember { mutableStateOf("Tap the button") }
+
+    val scope = rememberCoroutineScope()
+
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+
+            Text(
+                text = status,
+                style = MaterialTheme.typography.headlineSmall
+            )
+
+            Button(
+                onClick = {
+                    scope.launch {
+                        try {
+                            val response =
+                                RetrofitClient.api.getServerStatus()
+
+                            if (response.isSuccessful) {
+                                status =
+                                    response.body() ?: "Empty response"
+                            } else {
+                                status = "Error ${response.code()}"
+                            }
+
+                        } catch (e: Exception) {
+                            status = e.message ?: "Network Error"
+                        }
+                    }
+                }
+            ) {
+                Text("Connect to Lumo Backend")
+            }
+        }
     }
 }
