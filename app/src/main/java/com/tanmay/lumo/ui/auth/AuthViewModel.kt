@@ -2,7 +2,6 @@ package com.tanmay.lumo.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tanmay.lumo.data.model.AuthResponse
 import com.tanmay.lumo.data.remote.RetrofitClient
 import com.tanmay.lumo.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +15,9 @@ class AuthViewModel : ViewModel() {
         RetrofitClient.api
     )
 
-    private val _loginResult = MutableStateFlow<AuthResponse?>(null)
+    private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
 
-    val loginResult: StateFlow<AuthResponse?> = _loginResult.asStateFlow()
+    val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
     fun login(
         email: String,
@@ -26,13 +25,35 @@ class AuthViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
 
-            val response = repository.login(
-                email,
-                password
-            )
+            _uiState.value = AuthUiState.Loading
 
-            if (response.isSuccessful) {
-                _loginResult.value = response.body()
+            try {
+                val response = repository.login(
+                    email,
+                    password
+                )
+
+                if (response.isSuccessful) {
+
+                    val body = response.body()
+
+                    if (body != null) {
+                        _uiState.value = AuthUiState.Success(body)
+                    } else {
+                        _uiState.value =
+                            AuthUiState.Error("Empty response from server")
+                    }
+
+                } else {
+                    _uiState.value =
+                        AuthUiState.Error("Login failed")
+                }
+
+            } catch (e: Exception) {
+                _uiState.value =
+                    AuthUiState.Error(
+                        e.message ?: "Something went wrong"
+                    )
             }
         }
     }
