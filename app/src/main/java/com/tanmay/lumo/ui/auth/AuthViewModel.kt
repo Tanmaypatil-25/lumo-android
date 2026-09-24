@@ -8,8 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.tanmay.lumo.data.local.SessionManager
 
-class AuthViewModel : ViewModel() {
+class AuthViewModel(
+    private val sessionManager: SessionManager
+) : ViewModel() {
 
     private val repository = AuthRepository(
         RetrofitClient.api
@@ -38,15 +41,14 @@ class AuthViewModel : ViewModel() {
                     val body = response.body()
 
                     if (body != null) {
+                        sessionManager.saveToken(body.token)
                         _uiState.value = AuthUiState.Success(body)
                     } else {
-                        _uiState.value =
-                            AuthUiState.Error("Empty response from server")
+                        _uiState.value = AuthUiState.Error("Empty response from server")
                     }
 
                 } else {
-                    _uiState.value =
-                        AuthUiState.Error("Login failed")
+                    _uiState.value = AuthUiState.Error("Login failed")
                 }
 
             } catch (e: Exception) {
