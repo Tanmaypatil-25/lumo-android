@@ -5,17 +5,33 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun AuthenticatedScreen() {
-
-    Box(
+fun AuthenticatedScreen(
+    viewModel: AuthViewModel
+) {
+    Column(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(
             text = "Welcome to Lumo 👋",
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Spacer(
+            modifier = Modifier.height(24.dp)
+        )
+
+        Button(
+            onClick = {
+                viewModel.logout()
+            }
+        ) {
+            Text("Logout")
+        }
     }
 }

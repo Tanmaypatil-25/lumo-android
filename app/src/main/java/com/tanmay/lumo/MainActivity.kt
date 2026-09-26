@@ -43,7 +43,9 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (isLoggedIn) {
-                    AuthenticatedScreen()
+                    AuthenticatedScreen(
+                        viewModel = authViewModel
+                    )
                 } else {
                     LoginScreen(
                         viewModel = authViewModel

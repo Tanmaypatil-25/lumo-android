@@ -36,6 +36,13 @@ class AuthViewModel(
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            sessionManager.clearSession()
+            _uiState.value = AuthUiState.Idle
+        }
+    }
+
     fun login(
         email: String,
         password: String
