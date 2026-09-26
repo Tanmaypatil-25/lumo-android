@@ -43,6 +43,49 @@ class AuthViewModel(
         }
     }
 
+    fun signup(
+        fullName: String,
+        email: String,
+        password: String,
+        bio: String
+    ) {
+        viewModelScope.launch {
+
+            _uiState.value = AuthUiState.Loading
+
+            try {
+                val response = repository.signup(
+                    fullName,
+                    email,
+                    password,
+                    bio
+                )
+
+                if (response.isSuccessful) {
+
+                    val body = response.body()
+
+                    if (body != null) {
+                        sessionManager.saveToken(body.token)
+                        _uiState.value = AuthUiState.Success(body)
+                    } else {
+                        _uiState.value =
+                            AuthUiState.Error("Empty response from server")
+                    }
+
+                } else {
+                    _uiState.value =
+                        AuthUiState.Error("Signup failed")
+                }
+
+            } catch (e: Exception) {
+                _uiState.value = AuthUiState.Error(
+                    e.message ?: "Something went wrong"
+                )
+            }
+        }
+    }
+
     fun login(
         email: String,
         password: String

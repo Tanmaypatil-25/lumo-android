@@ -14,6 +14,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.tanmay.lumo.ui.auth.AuthenticatedScreen
 import com.tanmay.lumo.data.remote.RetrofitClient
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.tanmay.lumo.ui.auth.SignupScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -25,6 +29,10 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             LumoTheme {
+
+                var showSignup by remember {
+                    mutableStateOf(false)
+                }
 
                 val sessionManager = SessionManager(applicationContext)
 
@@ -47,9 +55,22 @@ class MainActivity : ComponentActivity() {
                         viewModel = authViewModel
                     )
                 } else {
-                    LoginScreen(
-                        viewModel = authViewModel
-                    )
+
+                    if (showSignup) {
+                        SignupScreen(
+                            viewModel = authViewModel,
+                            onLoginClick = {
+                                showSignup = false
+                            }
+                        )
+                    } else {
+                        LoginScreen(
+                            viewModel = authViewModel,
+                            onSignupClick = {
+                                showSignup = true
+                            }
+                        )
+                    }
                 }
             }
         }

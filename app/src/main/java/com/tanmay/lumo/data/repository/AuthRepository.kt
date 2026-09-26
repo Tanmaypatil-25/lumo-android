@@ -5,6 +5,7 @@ import com.tanmay.lumo.data.model.LoginRequest
 import com.tanmay.lumo.data.remote.ApiService
 import retrofit2.Response
 import com.tanmay.lumo.data.model.CheckAuthResponse
+import com.tanmay.lumo.data.model.SignupRequest
 
 class AuthRepository(
     private val apiService: ApiService
@@ -25,5 +26,22 @@ class AuthRepository(
         )
 
         return apiService.login(request)
+    }
+
+    suspend fun signup(
+        fullName: String,
+        email: String,
+        password: String,
+        bio: String
+    ): Response<AuthResponse> {
+
+        val request = SignupRequest(
+            fullName = fullName,
+            email = email,
+            password = password,
+            bio = bio
+        )
+
+        return apiService.signup(request)
     }
 }

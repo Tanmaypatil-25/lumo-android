@@ -9,20 +9,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun LoginScreen(
+fun SignupScreen(
     viewModel: AuthViewModel,
-    onSignupClick: () -> Unit
+    onLoginClick: () -> Unit
 ) {
-
     val uiState by viewModel.uiState.collectAsState()
 
-    var email by remember {
-        mutableStateOf("")
-    }
-
-    var password by remember {
-        mutableStateOf("")
-    }
+    var fullName by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var bio by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -33,30 +29,44 @@ fun LoginScreen(
     ) {
 
         Text(
-            text = "Welcome to Lumo",
+            text = "Create your Lumo account",
             style = MaterialTheme.typography.headlineMedium
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = { fullName = it },
+            label = { Text("Full Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = {
-                Text("Email")
-            },
+            label = { Text("Email") },
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = {
-                Text("Password")
-            },
+            label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = bio,
+            onValueChange = { bio = it },
+            label = { Text("Bio") },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -64,49 +74,41 @@ fun LoginScreen(
 
         Button(
             onClick = {
-                viewModel.login(
+                viewModel.signup(
+                    fullName = fullName,
                     email = email,
-                    password = password
+                    password = password,
+                    bio = bio
                 )
             },
             enabled = uiState !is AuthUiState.Loading,
             modifier = Modifier.fillMaxWidth()
         ) {
-
             if (uiState is AuthUiState.Loading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
                     strokeWidth = 2.dp
                 )
             } else {
-                Text("Login")
+                Text("Sign Up")
             }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         TextButton(
-            onClick = onSignupClick
+            onClick = onLoginClick
         ) {
-            Text("Don't have an account? Sign Up")
+            Text("Already have an account? Login")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        if (uiState is AuthUiState.Error) {
+            Spacer(modifier = Modifier.height(8.dp))
 
-        when (val state = uiState) {
-
-            is AuthUiState.Error -> {
-                Text(
-                    text = state.message,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-
-            is AuthUiState.Success -> {
-                Text(
-                    text = "Login successful!"
-                )
-            }
-
-            else -> Unit
+            Text(
+                text = (uiState as AuthUiState.Error).message,
+                color = MaterialTheme.colorScheme.error
+            )
         }
     }
 }
