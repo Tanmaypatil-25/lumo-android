@@ -8,6 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.POST
 import com.tanmay.lumo.data.model.CheckAuthResponse
 import com.tanmay.lumo.data.model.SignupRequest
+import com.tanmay.lumo.data.model.SidebarUsersResponse
 
 interface ApiService {
 
@@ -21,6 +22,9 @@ interface ApiService {
 
     @GET("api/auth/check")
     suspend fun checkAuth(): Response<CheckAuthResponse>
+
+    @GET("api/messages/users")
+    suspend fun getUsers(): Response<SidebarUsersResponse>
 
     @POST("api/auth/signup")
     suspend fun signup(

@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.tanmay.lumo.ui.auth.SignupScreen
+import com.tanmay.lumo.ui.chat.ChatViewModel
+import com.tanmay.lumo.ui.chat.HomeScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -44,6 +46,8 @@ class MainActivity : ComponentActivity() {
                     factory = AuthViewModelFactory(sessionManager)
                 )
 
+                val chatViewModel: ChatViewModel = viewModel()
+
                 LaunchedEffect(isLoggedIn) {
                     if (isLoggedIn) {
                         authViewModel.checkAuth()
@@ -51,8 +55,11 @@ class MainActivity : ComponentActivity() {
                 }
 
                 if (isLoggedIn) {
-                    AuthenticatedScreen(
-                        viewModel = authViewModel
+                    HomeScreen(
+                        chatViewModel = chatViewModel,
+                        onLogout = {
+                            authViewModel.logout()
+                        }
                     )
                 } else {
 
