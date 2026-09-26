@@ -22,6 +22,20 @@ class AuthViewModel(
 
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
 
+    fun checkAuth() {
+        viewModelScope.launch {
+            try {
+                val response = repository.checkAuth()
+
+                if (!response.isSuccessful) {
+                    sessionManager.clearSession()
+                }
+            } catch (e: Exception) {
+                // Don't logout on network failure
+            }
+        }
+    }
+
     fun login(
         email: String,
         password: String

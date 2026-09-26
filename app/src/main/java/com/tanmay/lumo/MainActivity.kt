@@ -3,6 +3,7 @@ package com.tanmay.lumo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tanmay.lumo.ui.auth.AuthViewModel
 import com.tanmay.lumo.ui.auth.LoginScreen
@@ -12,11 +13,14 @@ import com.tanmay.lumo.ui.auth.AuthViewModelFactory
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.tanmay.lumo.ui.auth.AuthenticatedScreen
+import com.tanmay.lumo.data.remote.RetrofitClient
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        RetrofitClient.initialize(applicationContext)
 
         setContent {
 
@@ -31,6 +35,12 @@ class MainActivity : ComponentActivity() {
                 val authViewModel: AuthViewModel = viewModel(
                     factory = AuthViewModelFactory(sessionManager)
                 )
+
+                LaunchedEffect(isLoggedIn) {
+                    if (isLoggedIn) {
+                        authViewModel.checkAuth()
+                    }
+                }
 
                 if (isLoggedIn) {
                     AuthenticatedScreen()
