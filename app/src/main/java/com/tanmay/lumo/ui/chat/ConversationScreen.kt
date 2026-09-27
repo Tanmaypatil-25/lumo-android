@@ -10,11 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tanmay.lumo.data.model.Message
 import com.tanmay.lumo.data.model.User
+import androidx.compose.runtime.*
 
 @Composable
 fun ConversationScreen(
     state: ConversationUiState,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onSendMessage: (String) -> Unit
 ) {
 
     when (state) {
@@ -61,7 +63,8 @@ fun ConversationScreen(
             ConversationContent(
                 user = state.selectedUser,
                 messages = state.messages,
-                onBack = onBack
+                onBack = onBack,
+                onSendMessage = onSendMessage
             )
         }
     }
@@ -71,8 +74,13 @@ fun ConversationScreen(
 private fun ConversationContent(
     user: User,
     messages: List<Message>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onSendMessage: (String) -> Unit
 ) {
+
+    var messageText by remember {
+        mutableStateOf("")
+    }
 
     Column(
         modifier = Modifier
@@ -110,7 +118,7 @@ private fun ConversationContent(
         if (messages.isEmpty()) {
 
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 Text("No messages yet")
@@ -119,7 +127,7 @@ private fun ConversationContent(
         } else {
 
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.weight(1f),
                 verticalArrangement =
                     Arrangement.spacedBy(8.dp)
             ) {
@@ -136,6 +144,48 @@ private fun ConversationContent(
                 }
             }
         }
+
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            OutlinedTextField(
+                value = messageText,
+                onValueChange = {
+                    messageText = it
+                },
+                modifier = Modifier.weight(1f),
+                placeholder = {
+                    Text("Type a message...")
+                },
+                singleLine = true
+            )
+
+            Spacer(
+                modifier = Modifier.width(8.dp)
+            )
+
+            Button(
+                onClick = {
+
+                    if (messageText.isNotBlank()) {
+
+                        onSendMessage(messageText)
+
+                        messageText = ""
+                    }
+                }
+            ) {
+                Text("Send")
+            }
+        }
+
+
     }
 }
 

@@ -141,4 +141,52 @@ class ChatViewModel : ViewModel() {
         _conversationState.value =
             ConversationUiState.Idle
     }
+
+    fun sendMessage(text: String) {
+
+        val currentState =
+            _conversationState.value
+
+        if (currentState !is ConversationUiState.Success) {
+            return
+        }
+
+        val trimmedText = text.trim()
+
+        if (trimmedText.isBlank()) {
+            return
+        }
+
+        viewModelScope.launch {
+
+            try {
+
+                val response =
+                    repository.sendMessage(
+                        userId = currentState.selectedUser._id,
+                        text = trimmedText
+                    )
+
+                if (response.isSuccessful) {
+
+                    val body = response.body()
+
+                    if (body != null) {
+
+                        val updatedMessages =
+                            currentState.messages +
+                                    body.newMessage
+
+                        _conversationState.value =
+                            currentState.copy(
+                                messages = updatedMessages
+                            )
+                    }
+                }
+
+            } catch (e: Exception) {
+                // We'll add proper send-error UI later
+            }
+        }
+    }
 }

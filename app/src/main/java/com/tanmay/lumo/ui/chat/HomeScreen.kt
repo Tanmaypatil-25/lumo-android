@@ -30,6 +30,9 @@ fun HomeScreen(
             state = conversationState,
             onBack = {
                 chatViewModel.closeConversation()
+            },
+            onSendMessage = { text ->
+                chatViewModel.sendMessage(text)
             }
         )
 

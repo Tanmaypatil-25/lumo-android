@@ -12,6 +12,10 @@ import com.tanmay.lumo.data.model.SidebarUsersResponse
 import com.tanmay.lumo.data.model.MessagesResponse
 import retrofit2.http.Path
 import retrofit2.http.Query
+import com.tanmay.lumo.data.model.SendMessageResponse
+import okhttp3.RequestBody
+import retrofit2.http.Multipart
+import retrofit2.http.Part
 
 interface ApiService {
 
@@ -39,5 +43,12 @@ interface ApiService {
     suspend fun signup(
         @Body request: SignupRequest
     ): Response<AuthResponse>
+
+    @Multipart
+    @POST("api/messages/send/{userId}")
+    suspend fun sendMessage(
+        @Path("userId") userId: String,
+        @Part("text") text: RequestBody
+    ): Response<SendMessageResponse>
 
 }
