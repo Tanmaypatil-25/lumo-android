@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.tanmay.lumo.data.model.User
 
 class ChatViewModel : ViewModel() {
 
@@ -22,6 +23,14 @@ class ChatViewModel : ViewModel() {
 
     val uiState: StateFlow<ChatUiState> =
         _uiState.asStateFlow()
+
+    private val _conversationState =
+        MutableStateFlow<ConversationUiState>(
+            ConversationUiState.Idle
+        )
+
+    val conversationState: StateFlow<ConversationUiState> =
+        _conversationState.asStateFlow()
 
     fun getUsers() {
 
@@ -73,5 +82,63 @@ class ChatViewModel : ViewModel() {
                     )
             }
         }
+    }
+
+    fun selectUser(user: User) {
+
+        viewModelScope.launch {
+
+            _conversationState.value =
+                ConversationUiState.Loading
+
+            try {
+
+                val response =
+                    repository.getMessages(user._id)
+
+                if (response.isSuccessful) {
+
+                    val body = response.body()
+
+                    if (body != null) {
+
+                        _conversationState.value =
+                            ConversationUiState.Success(
+                                selectedUser = user,
+                                messages = body.messages,
+                                hasMore = body.hasMore,
+                                nextCursor = body.nextCursor
+                            )
+
+                    } else {
+
+                        _conversationState.value =
+                            ConversationUiState.Error(
+                                "Empty response from server"
+                            )
+                    }
+
+                } else {
+
+                    _conversationState.value =
+                        ConversationUiState.Error(
+                            "Failed to load messages"
+                        )
+                }
+
+            } catch (e: Exception) {
+
+                _conversationState.value =
+                    ConversationUiState.Error(
+                        e.message
+                            ?: "Something went wrong"
+                    )
+            }
+        }
+    }
+
+    fun closeConversation() {
+        _conversationState.value =
+            ConversationUiState.Idle
     }
 }

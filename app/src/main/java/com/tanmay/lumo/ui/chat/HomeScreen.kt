@@ -18,9 +18,22 @@ fun HomeScreen(
 ) {
 
     val uiState by chatViewModel.uiState.collectAsState()
+    val conversationState by chatViewModel.conversationState.collectAsState()
 
     LaunchedEffect(Unit) {
         chatViewModel.getUsers()
+    }
+
+    if (conversationState !is ConversationUiState.Idle) {
+
+        ConversationScreen(
+            state = conversationState,
+            onBack = {
+                chatViewModel.closeConversation()
+            }
+        )
+
+        return
     }
 
     Column(
@@ -106,9 +119,10 @@ fun HomeScreen(
                         UserItem(
                             user = user,
                             unseenCount =
-                                state.unseenMessages[
-                                    user._id
-                                ] ?: 0
+                                state.unseenMessages[user._id] ?: 0,
+                            onClick = {
+                                chatViewModel.selectUser(user)
+                            }
                         )
                     }
                 }
@@ -120,14 +134,15 @@ fun HomeScreen(
 @Composable
 private fun UserItem(
     user: User,
-    unseenCount: Int
+    unseenCount: Int,
+    onClick: () -> Unit
 ) {
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                // Conversation navigation comes next
+                onClick()
             }
     ) {
 

@@ -9,6 +9,9 @@ import retrofit2.http.POST
 import com.tanmay.lumo.data.model.CheckAuthResponse
 import com.tanmay.lumo.data.model.SignupRequest
 import com.tanmay.lumo.data.model.SidebarUsersResponse
+import com.tanmay.lumo.data.model.MessagesResponse
+import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -25,6 +28,12 @@ interface ApiService {
 
     @GET("api/messages/users")
     suspend fun getUsers(): Response<SidebarUsersResponse>
+
+    @GET("api/messages/{userId}")
+    suspend fun getMessages(
+        @Path("userId") userId: String,
+        @Query("limit") limit: Int = 30
+    ): Response<MessagesResponse>
 
     @POST("api/auth/signup")
     suspend fun signup(
