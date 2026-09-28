@@ -20,6 +20,8 @@ import androidx.compose.runtime.setValue
 import com.tanmay.lumo.ui.auth.SignupScreen
 import com.tanmay.lumo.ui.chat.ChatViewModel
 import com.tanmay.lumo.ui.chat.HomeScreen
+import com.tanmay.lumo.data.remote.SocketManager
+import com.tanmay.lumo.BuildConfig
 
 class MainActivity : ComponentActivity() {
 
@@ -42,6 +44,10 @@ class MainActivity : ComponentActivity() {
                     initial = false
                 )
 
+                val token by sessionManager.token.collectAsState(
+                    initial = null
+                )
+
                 val authViewModel: AuthViewModel = viewModel(
                     factory = AuthViewModelFactory(sessionManager)
                 )
@@ -51,6 +57,24 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(isLoggedIn) {
                     if (isLoggedIn) {
                         authViewModel.checkAuth()
+                    }
+                }
+
+                LaunchedEffect(isLoggedIn, token) {
+
+                    if (
+                        isLoggedIn &&
+                        !token.isNullOrBlank()
+                    ) {
+
+                        SocketManager.connect(
+                            serverUrl = BuildConfig.BASE_URL,
+                            token = token!!
+                        )
+
+                    } else {
+
+                        SocketManager.disconnect()
                     }
                 }
 
