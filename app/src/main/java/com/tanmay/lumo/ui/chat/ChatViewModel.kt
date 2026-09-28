@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.tanmay.lumo.data.model.User
+import com.tanmay.lumo.data.remote.SocketManager
 
 class ChatViewModel : ViewModel() {
 
@@ -31,6 +32,74 @@ class ChatViewModel : ViewModel() {
 
     val conversationState: StateFlow<ConversationUiState> =
         _conversationState.asStateFlow()
+
+    init {
+        SocketManager.setOnNewMessageListener { message ->
+
+            val currentConversation = _conversationState.value
+
+            if (
+                currentConversation is ConversationUiState.Success &&
+                message.senderId == currentConversation.selectedUser._id
+            ) {
+
+                val alreadyExists = currentConversation.messages.any {
+                    it._id == message._id
+                }
+
+                if (!alreadyExists) {
+                    _conversationState.value = currentConversation.copy(
+                        messages = currentConversation.messages + message
+                    )
+                }
+
+                viewModelScope.launch {
+                    try {
+                        repository.markMessageAsSeen(message._id)
+                    } catch (e: Exception) {
+                        // Handle later
+                    }
+                }
+
+            } else {
+
+                val currentUsersState = _uiState.value
+
+                if (currentUsersState is ChatUiState.Success) {
+
+                    val currentCount =
+                        currentUsersState.unseenMessages[message.senderId] ?: 0
+
+                    _uiState.value = currentUsersState.copy(
+                        unseenMessages =
+                            currentUsersState.unseenMessages +
+                                    (message.senderId to currentCount + 1)
+                    )
+                }
+            }
+        }
+
+        SocketManager.setOnMessageSeenListener { messageId ->
+
+            val currentState = _conversationState.value
+
+            if (currentState is ConversationUiState.Success) {
+
+                val updatedMessages = currentState.messages.map { message ->
+
+                    if (message._id == messageId) {
+                        message.copy(seen = true)
+                    } else {
+                        message
+                    }
+                }
+
+                _conversationState.value = currentState.copy(
+                    messages = updatedMessages
+                )
+            }
+        }
+    }
 
     fun getUsers() {
 
@@ -109,6 +178,15 @@ class ChatViewModel : ViewModel() {
                                 hasMore = body.hasMore,
                                 nextCursor = body.nextCursor
                             )
+
+                        val currentUsersState = _uiState.value
+
+                        if (currentUsersState is ChatUiState.Success) {
+                            _uiState.value = currentUsersState.copy(
+                                unseenMessages =
+                                    currentUsersState.unseenMessages - user._id
+                            )
+                        }
 
                     } else {
 

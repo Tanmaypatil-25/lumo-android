@@ -39,4 +39,10 @@ class ChatRepository(
             text = textBody
         )
     }
+
+    suspend fun markMessageAsSeen(
+        messageId: String
+    ): Response<Unit> {
+        return apiService.markMessageAsSeen(messageId)
+    }
 }

@@ -15,6 +15,7 @@ import retrofit2.http.Query
 import com.tanmay.lumo.data.model.SendMessageResponse
 import okhttp3.RequestBody
 import retrofit2.http.Multipart
+import retrofit2.http.PUT
 import retrofit2.http.Part
 
 interface ApiService {
@@ -43,6 +44,11 @@ interface ApiService {
     suspend fun signup(
         @Body request: SignupRequest
     ): Response<AuthResponse>
+
+    @PUT("api/messages/mark/{messageId}")
+    suspend fun markMessageAsSeen(
+        @Path("messageId") messageId: String
+    ): Response<Unit>
 
     @Multipart
     @POST("api/messages/send/{userId}")
