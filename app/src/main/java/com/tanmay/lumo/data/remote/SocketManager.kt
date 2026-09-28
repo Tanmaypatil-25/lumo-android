@@ -24,6 +24,14 @@ object SocketManager {
         onMessageSeenListener = listener
     }
 
+    private var onOnlineUsersListener: ((List<String>) -> Unit)? = null
+
+    fun setOnOnlineUsersListener(
+        listener: (List<String>) -> Unit
+    ) {
+        onOnlineUsersListener = listener
+    }
+
     fun connect(
         serverUrl: String,
         token: String
@@ -105,6 +113,36 @@ object SocketManager {
 
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to process messageSeen", e)
+                }
+            }
+
+            socket?.on("getOnlineUsers") { args ->
+
+                try {
+                    val data = args.firstOrNull() as? org.json.JSONArray
+
+                    if (data != null) {
+
+                        val onlineUsers = mutableListOf<String>()
+
+                        for (i in 0 until data.length()) {
+                            onlineUsers.add(data.getString(i))
+                        }
+
+                        Log.d(
+                            TAG,
+                            "Online users: $onlineUsers"
+                        )
+
+                        onOnlineUsersListener?.invoke(onlineUsers)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(
+                        TAG,
+                        "Failed to process online users",
+                        e
+                    )
                 }
             }
 

@@ -16,7 +16,8 @@ import androidx.compose.runtime.*
 fun ConversationScreen(
     state: ConversationUiState,
     onBack: () -> Unit,
-    onSendMessage: (String) -> Unit
+    onSendMessage: (String) -> Unit,
+    onlineUsers: Set<String>
 ) {
 
     when (state) {
@@ -64,7 +65,8 @@ fun ConversationScreen(
                 user = state.selectedUser,
                 messages = state.messages,
                 onBack = onBack,
-                onSendMessage = onSendMessage
+                onSendMessage = onSendMessage,
+                isOnline = state.selectedUser._id in onlineUsers
             )
         }
     }
@@ -75,7 +77,8 @@ private fun ConversationContent(
     user: User,
     messages: List<Message>,
     onBack: () -> Unit,
-    onSendMessage: (String) -> Unit
+    onSendMessage: (String) -> Unit,
+    isOnline: Boolean
 ) {
 
     var messageText by remember {
@@ -103,10 +106,16 @@ private fun ConversationContent(
                 modifier = Modifier.width(8.dp)
             )
 
-            Text(
-                text = user.fullName,
-                style = MaterialTheme.typography.titleLarge
-            )
+            Column {
+                Text(
+                    text = user.fullName
+                )
+
+                Text(
+                    text = if (isOnline) "Online" else "Offline",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
 
         HorizontalDivider()

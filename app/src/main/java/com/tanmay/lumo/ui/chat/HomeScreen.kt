@@ -19,6 +19,7 @@ fun HomeScreen(
 
     val uiState by chatViewModel.uiState.collectAsState()
     val conversationState by chatViewModel.conversationState.collectAsState()
+    val onlineUsers by chatViewModel.onlineUsers.collectAsState()
 
     LaunchedEffect(Unit) {
         chatViewModel.getUsers()
@@ -28,12 +29,11 @@ fun HomeScreen(
 
         ConversationScreen(
             state = conversationState,
-            onBack = {
-                chatViewModel.closeConversation()
-            },
+            onBack = { chatViewModel.closeConversation() },
             onSendMessage = { text ->
                 chatViewModel.sendMessage(text)
-            }
+            },
+            onlineUsers = onlineUsers
         )
 
         return
@@ -123,6 +123,7 @@ fun HomeScreen(
                             user = user,
                             unseenCount =
                                 state.unseenMessages[user._id] ?: 0,
+                            isOnline = user._id in onlineUsers,
                             onClick = {
                                 chatViewModel.selectUser(user)
                             }
@@ -138,6 +139,7 @@ fun HomeScreen(
 private fun UserItem(
     user: User,
     unseenCount: Int,
+    isOnline: Boolean,
     onClick: () -> Unit
 ) {
 
@@ -166,6 +168,13 @@ private fun UserItem(
                     style =
                         MaterialTheme.typography.titleMedium
                 )
+
+                if (isOnline) {
+                    Text(
+                        text = "Online",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
 
                 if (!user.bio.isNullOrBlank()) {
 

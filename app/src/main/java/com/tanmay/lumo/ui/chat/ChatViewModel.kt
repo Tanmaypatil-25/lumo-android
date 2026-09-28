@@ -33,6 +33,12 @@ class ChatViewModel : ViewModel() {
     val conversationState: StateFlow<ConversationUiState> =
         _conversationState.asStateFlow()
 
+    private val _onlineUsers =
+        MutableStateFlow<Set<String>>(emptySet())
+
+    val onlineUsers: StateFlow<Set<String>> =
+        _onlineUsers.asStateFlow()
+
     init {
         SocketManager.setOnNewMessageListener { message ->
 
@@ -98,6 +104,11 @@ class ChatViewModel : ViewModel() {
                     messages = updatedMessages
                 )
             }
+        }
+
+        SocketManager.setOnOnlineUsersListener { users ->
+
+            _onlineUsers.value = users.toSet()
         }
     }
 
