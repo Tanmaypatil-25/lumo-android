@@ -39,6 +39,12 @@ class ChatViewModel : ViewModel() {
     val onlineUsers: StateFlow<Set<String>> =
         _onlineUsers.asStateFlow()
 
+    private val _typingUsers =
+        MutableStateFlow<Set<String>>(emptySet())
+
+    val typingUsers: StateFlow<Set<String>> =
+        _typingUsers.asStateFlow()
+
     init {
         SocketManager.setOnNewMessageListener { message ->
 
@@ -109,6 +115,14 @@ class ChatViewModel : ViewModel() {
         SocketManager.setOnOnlineUsersListener { users ->
 
             _onlineUsers.value = users.toSet()
+        }
+
+        SocketManager.setOnTypingListener { userId ->
+            _typingUsers.value = _typingUsers.value + userId
+        }
+
+        SocketManager.setOnStopTypingListener { userId ->
+            _typingUsers.value = _typingUsers.value - userId
         }
     }
 
@@ -277,5 +291,13 @@ class ChatViewModel : ViewModel() {
                 // We'll add proper send-error UI later
             }
         }
+    }
+
+    fun startTyping(receiverId: String) {
+        SocketManager.emitTyping(receiverId)
+    }
+
+    fun stopTyping(receiverId: String) {
+        SocketManager.emitStopTyping(receiverId)
     }
 }

@@ -20,6 +20,7 @@ fun HomeScreen(
     val uiState by chatViewModel.uiState.collectAsState()
     val conversationState by chatViewModel.conversationState.collectAsState()
     val onlineUsers by chatViewModel.onlineUsers.collectAsState()
+    val typingUsers by chatViewModel.typingUsers.collectAsState()
 
     LaunchedEffect(Unit) {
         chatViewModel.getUsers()
@@ -33,7 +34,14 @@ fun HomeScreen(
             onSendMessage = { text ->
                 chatViewModel.sendMessage(text)
             },
-            onlineUsers = onlineUsers
+            onlineUsers = onlineUsers,
+            typingUsers = typingUsers,
+            onTyping = { receiverId ->
+                chatViewModel.startTyping(receiverId)
+            },
+            onStopTyping = { receiverId ->
+                chatViewModel.stopTyping(receiverId)
+            }
         )
 
         return

@@ -26,10 +26,27 @@ object SocketManager {
 
     private var onOnlineUsersListener: ((List<String>) -> Unit)? = null
 
+    private var latestOnlineUsers: List<String> = emptyList()
+
     fun setOnOnlineUsersListener(
         listener: (List<String>) -> Unit
     ) {
         onOnlineUsersListener = listener
+
+        if (latestOnlineUsers.isNotEmpty()) {
+            listener(latestOnlineUsers)
+        }
+    }
+
+    private var onTypingListener: ((String) -> Unit)? = null
+    private var onStopTypingListener: ((String) -> Unit)? = null
+
+    fun setOnTypingListener(listener: (String) -> Unit) {
+        onTypingListener = listener
+    }
+
+    fun setOnStopTypingListener(listener: (String) -> Unit) {
+        onStopTypingListener = listener
     }
 
     fun connect(
@@ -134,6 +151,8 @@ object SocketManager {
                             "Online users: $onlineUsers"
                         )
 
+                        latestOnlineUsers = onlineUsers
+
                         onOnlineUsersListener?.invoke(onlineUsers)
                     }
 
@@ -143,6 +162,36 @@ object SocketManager {
                         "Failed to process online users",
                         e
                     )
+                }
+            }
+
+            socket?.on("typing") { args ->
+                try {
+                    val data = args.firstOrNull() as? org.json.JSONObject
+
+                    if (data != null) {
+                        val senderId = data.getString("senderId")
+
+                        onTypingListener?.invoke(senderId)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to process typing event", e)
+                }
+            }
+
+            socket?.on("stopTyping") { args ->
+                try {
+                    val data = args.firstOrNull() as? org.json.JSONObject
+
+                    if (data != null) {
+                        val senderId = data.getString("senderId")
+
+                        onStopTypingListener?.invoke(senderId)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to process stopTyping event", e)
                 }
             }
 
@@ -176,5 +225,13 @@ object SocketManager {
         listener: (Message) -> Unit
     ) {
         onNewMessageListener = listener
+    }
+
+    fun emitTyping(receiverId: String) {
+        socket?.emit("typing", receiverId)
+    }
+
+    fun emitStopTyping(receiverId: String) {
+        socket?.emit("stopTyping", receiverId)
     }
 }

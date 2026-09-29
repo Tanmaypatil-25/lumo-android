@@ -11,13 +11,19 @@ import androidx.compose.ui.unit.dp
 import com.tanmay.lumo.data.model.Message
 import com.tanmay.lumo.data.model.User
 import androidx.compose.runtime.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun ConversationScreen(
     state: ConversationUiState,
     onBack: () -> Unit,
     onSendMessage: (String) -> Unit,
-    onlineUsers: Set<String>
+    onlineUsers: Set<String>,
+    typingUsers: Set<String>,
+    onTyping: (String) -> Unit,
+    onStopTyping: (String) -> Unit
 ) {
 
     when (state) {
@@ -66,7 +72,10 @@ fun ConversationScreen(
                 messages = state.messages,
                 onBack = onBack,
                 onSendMessage = onSendMessage,
-                isOnline = state.selectedUser._id in onlineUsers
+                isOnline = state.selectedUser._id in onlineUsers,
+                isTyping = state.selectedUser._id in typingUsers,
+                onTyping = onTyping,
+                onStopTyping = onStopTyping
             )
         }
     }
@@ -78,11 +87,20 @@ private fun ConversationContent(
     messages: List<Message>,
     onBack: () -> Unit,
     onSendMessage: (String) -> Unit,
-    isOnline: Boolean
+    isOnline: Boolean,
+    isTyping: Boolean,
+    onTyping: (String) -> Unit,
+    onStopTyping: (String) -> Unit
 ) {
 
     var messageText by remember {
         mutableStateOf("")
+    }
+
+    val scope = rememberCoroutineScope()
+
+    var typingJob by remember {
+        mutableStateOf<Job?>(null)
     }
 
     Column(
@@ -97,7 +115,11 @@ private fun ConversationContent(
         ) {
 
             TextButton(
-                onClick = onBack
+                onClick = {
+                    typingJob?.cancel()
+                    onStopTyping(user._id)
+                    onBack()
+                }
             ) {
                 Text("Back")
             }
@@ -112,7 +134,11 @@ private fun ConversationContent(
                 )
 
                 Text(
-                    text = if (isOnline) "Online" else "Offline",
+                    text = when {
+                        isTyping -> "Typing..."
+                        isOnline -> "Online"
+                        else -> "Offline"
+                    },
                     style = MaterialTheme.typography.bodySmall
                 )
             }
@@ -165,8 +191,27 @@ private fun ConversationContent(
 
             OutlinedTextField(
                 value = messageText,
-                onValueChange = {
-                    messageText = it
+                onValueChange = { newValue ->
+
+                    messageText = newValue
+
+                    // Cancel the previous stop-typing timer
+                    typingJob?.cancel()
+
+                    if (newValue.isNotBlank()) {
+
+                        onTyping(user._id)
+
+                        // If there are no more keystrokes for 1 second,
+                        // consider the user to have stopped typing
+                        typingJob = scope.launch {
+                            delay(1000)
+                            onStopTyping(user._id)
+                        }
+
+                    } else {
+                        onStopTyping(user._id)
+                    }
                 },
                 modifier = Modifier.weight(1f),
                 placeholder = {
@@ -184,8 +229,10 @@ private fun ConversationContent(
 
                     if (messageText.isNotBlank()) {
 
-                        onSendMessage(messageText)
+                        typingJob?.cancel()
+                        onStopTyping(user._id)
 
+                        onSendMessage(messageText)
                         messageText = ""
                     }
                 }
