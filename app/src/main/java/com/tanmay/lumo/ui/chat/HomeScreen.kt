@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tanmay.lumo.data.model.User
+import okhttp3.MultipartBody
 
 @Composable
 fun HomeScreen(
@@ -31,8 +32,11 @@ fun HomeScreen(
         ConversationScreen(
             state = conversationState,
             onBack = { chatViewModel.closeConversation() },
-            onSendMessage = { text ->
-                chatViewModel.sendMessage(text)
+            onSendMessage = { text, image ->
+                chatViewModel.sendMessage(
+                    text = text,
+                    image = image
+                )
             },
             onlineUsers = onlineUsers,
             typingUsers = typingUsers,

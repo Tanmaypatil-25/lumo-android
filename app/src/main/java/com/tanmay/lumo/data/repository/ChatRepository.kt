@@ -7,6 +7,7 @@ import com.tanmay.lumo.data.model.MessagesResponse
 import com.tanmay.lumo.data.model.SendMessageResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MultipartBody
 
 class ChatRepository(
     private val apiService: ApiService
@@ -27,7 +28,8 @@ class ChatRepository(
 
     suspend fun sendMessage(
         userId: String,
-        text: String
+        text: String,
+        image: MultipartBody.Part? = null
     ): Response<SendMessageResponse> {
 
         val textBody = text.toRequestBody(
@@ -36,7 +38,8 @@ class ChatRepository(
 
         return apiService.sendMessage(
             userId = userId,
-            text = textBody
+            text = textBody,
+            image = image
         )
     }
 

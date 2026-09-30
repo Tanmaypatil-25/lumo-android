@@ -17,6 +17,7 @@ import okhttp3.RequestBody
 import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import okhttp3.MultipartBody
 
 interface ApiService {
 
@@ -54,7 +55,8 @@ interface ApiService {
     @POST("api/messages/send/{userId}")
     suspend fun sendMessage(
         @Path("userId") userId: String,
-        @Part("text") text: RequestBody
+        @Part("text") text: RequestBody,
+        @Part image: MultipartBody.Part? = null
     ): Response<SendMessageResponse>
 
 }

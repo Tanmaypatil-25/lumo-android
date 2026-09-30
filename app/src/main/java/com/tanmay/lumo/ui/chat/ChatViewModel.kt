@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.tanmay.lumo.data.model.User
 import com.tanmay.lumo.data.remote.SocketManager
+import okhttp3.MultipartBody
 
 class ChatViewModel : ViewModel() {
 
@@ -245,7 +246,10 @@ class ChatViewModel : ViewModel() {
             ConversationUiState.Idle
     }
 
-    fun sendMessage(text: String) {
+    fun sendMessage(
+        text: String,
+        image: MultipartBody.Part? = null
+    ) {
 
         val currentState =
             _conversationState.value
@@ -256,7 +260,7 @@ class ChatViewModel : ViewModel() {
 
         val trimmedText = text.trim()
 
-        if (trimmedText.isBlank()) {
+        if (trimmedText.isBlank() && image == null) {
             return
         }
 
@@ -267,7 +271,8 @@ class ChatViewModel : ViewModel() {
                 val response =
                     repository.sendMessage(
                         userId = currentState.selectedUser._id,
-                        text = trimmedText
+                        text = trimmedText,
+                        image = image
                     )
 
                 if (response.isSuccessful) {

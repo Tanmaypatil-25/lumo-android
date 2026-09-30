@@ -14,12 +14,27 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import coil3.compose.AsyncImage
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
+import android.content.Context
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import androidx.compose.ui.platform.LocalContext
+
 
 @Composable
 fun ConversationScreen(
     state: ConversationUiState,
     onBack: () -> Unit,
-    onSendMessage: (String) -> Unit,
+    onSendMessage: (String, MultipartBody.Part?) -> Unit,
     onlineUsers: Set<String>,
     typingUsers: Set<String>,
     onTyping: (String) -> Unit,
@@ -86,7 +101,7 @@ private fun ConversationContent(
     user: User,
     messages: List<Message>,
     onBack: () -> Unit,
-    onSendMessage: (String) -> Unit,
+    onSendMessage: (String, MultipartBody.Part?) -> Unit,
     isOnline: Boolean,
     isTyping: Boolean,
     onTyping: (String) -> Unit,
@@ -97,7 +112,23 @@ private fun ConversationContent(
         mutableStateOf("")
     }
 
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+
+            if (uri != null) {
+                selectedImageUri = uri
+            }
+        }
+
     val scope = rememberCoroutineScope()
+
+    val context = LocalContext.current
 
     var typingJob by remember {
         mutableStateOf<Job?>(null)
@@ -184,10 +215,48 @@ private fun ConversationContent(
             modifier = Modifier.height(8.dp)
         )
 
+        if (selectedImageUri != null) {
+
+            Box(
+                modifier = Modifier.size(110.dp)
+            ) {
+
+                AsyncImage(
+                    model = selectedImageUri,
+                    contentDescription = "Selected image",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+
+                TextButton(
+                    onClick = {
+                        selectedImageUri = null
+                    },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Text("X")
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+
+            TextButton(
+                onClick = {
+                    imagePickerLauncher.launch(
+                        PickVisualMediaRequest(
+                            ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
+                }
+            ) {
+                Text("Image")
+            }
 
             OutlinedTextField(
                 value = messageText,
@@ -227,13 +296,25 @@ private fun ConversationContent(
             Button(
                 onClick = {
 
-                    if (messageText.isNotBlank()) {
+                    if (messageText.isNotBlank() || selectedImageUri != null) {
 
                         typingJob?.cancel()
                         onStopTyping(user._id)
 
-                        onSendMessage(messageText)
+                        val imagePart = selectedImageUri?.let { uri ->
+                            uriToMultipart(
+                                context = context,
+                                uri = uri
+                            )
+                        }
+
+                        onSendMessage(
+                            messageText,
+                            imagePart
+                        )
+
                         messageText = ""
+                        selectedImageUri = null
                     }
                 }
             ) {
@@ -278,20 +359,29 @@ private fun MessageItem(
                     .widthIn(max = 280.dp)
             ) {
 
-                if (!message.text.isNullOrBlank()) {
-                    Text(
-                        text = message.text
+                if (!message.image.isNullOrBlank()) {
+
+                    AsyncImage(
+                        model = message.image,
+                        contentDescription = "Message image",
+                        modifier = Modifier
+                            .width(220.dp)
+                            .height(220.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
                     )
                 }
 
-                if (!message.image.isNullOrBlank()) {
+                if (!message.text.isNullOrBlank()) {
 
-                    Spacer(
-                        modifier = Modifier.height(4.dp)
-                    )
+                    if (!message.image.isNullOrBlank()) {
+                        Spacer(
+                            modifier = Modifier.height(8.dp)
+                        )
+                    }
 
                     Text(
-                        text = "[Image]"
+                        text = message.text
                     )
                 }
 
@@ -310,4 +400,32 @@ private fun MessageItem(
             }
         }
     }
+}
+
+private fun uriToMultipart(
+    context: Context,
+    uri: Uri
+): MultipartBody.Part? {
+
+    val contentResolver = context.contentResolver
+
+    val mimeType =
+        contentResolver.getType(uri) ?: "image/jpeg"
+
+    val inputStream =
+        contentResolver.openInputStream(uri) ?: return null
+
+    val bytes = inputStream.use {
+        it.readBytes()
+    }
+
+    val requestBody = bytes.toRequestBody(
+        mimeType.toMediaTypeOrNull()
+    )
+
+    return MultipartBody.Part.createFormData(
+        name = "image",
+        filename = "image_${System.currentTimeMillis()}",
+        body = requestBody
+    )
 }
