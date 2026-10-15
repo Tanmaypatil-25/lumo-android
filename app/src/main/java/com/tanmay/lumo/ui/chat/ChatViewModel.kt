@@ -298,6 +298,49 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+    fun editMessage( messageId: String, newText: String ) {
+
+        val trimmedText = newText.trim()
+        if (trimmedText.isBlank()) {
+            return
+        }
+
+        val currentState = _conversationState.value
+        if (currentState !is ConversationUiState.Success) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val response = repository.editMessage( messageId = messageId, text = trimmedText )
+
+                if (response.isSuccessful) {
+                    val updatedMessage =
+                        response.body()?.updatedMessage
+                            ?: return@launch
+
+                    val latestState = _conversationState.value
+
+                    if (latestState is ConversationUiState.Success) {
+                        _conversationState.value = latestState.copy(
+                            messages = latestState.messages.map { message ->
+                                if (message._id == updatedMessage._id) {
+                                    updatedMessage
+                                } else {
+                                    message
+                                }
+                            }
+                        )
+                    }
+                }
+
+            } catch (e: Exception) {
+                // Proper error handling will be added
+                // during the stability pass.
+            }
+        }
+    }
+
     fun startTyping(receiverId: String) {
         SocketManager.emitTyping(receiverId)
     }

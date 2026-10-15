@@ -8,6 +8,8 @@ import com.tanmay.lumo.data.model.SendMessageResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MultipartBody
+import com.tanmay.lumo.data.model.EditMessageRequest
+import com.tanmay.lumo.data.model.EditMessageResponse
 
 class ChatRepository(
     private val apiService: ApiService
@@ -40,6 +42,19 @@ class ChatRepository(
             userId = userId,
             text = textBody,
             image = image
+        )
+    }
+
+    suspend fun editMessage(
+        messageId: String,
+        text: String
+    ): Response<EditMessageResponse> {
+
+        return apiService.editMessage(
+            messageId = messageId,
+            request = EditMessageRequest(
+                text = text
+            )
         )
     }
 

@@ -28,6 +28,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.ExperimentalFoundationApi
 
 
 @Composable
@@ -38,7 +40,8 @@ fun ConversationScreen(
     onlineUsers: Set<String>,
     typingUsers: Set<String>,
     onTyping: (String) -> Unit,
-    onStopTyping: (String) -> Unit
+    onStopTyping: (String) -> Unit,
+    onEditMessage: (String, String) -> Unit,
 ) {
 
     when (state) {
@@ -87,6 +90,7 @@ fun ConversationScreen(
                 messages = state.messages,
                 onBack = onBack,
                 onSendMessage = onSendMessage,
+                onEditMessage = onEditMessage,
                 isOnline = state.selectedUser._id in onlineUsers,
                 isTyping = state.selectedUser._id in typingUsers,
                 onTyping = onTyping,
@@ -102,6 +106,7 @@ private fun ConversationContent(
     messages: List<Message>,
     onBack: () -> Unit,
     onSendMessage: (String, MultipartBody.Part?) -> Unit,
+    onEditMessage: (String, String) -> Unit,
     isOnline: Boolean,
     isTyping: Boolean,
     onTyping: (String) -> Unit,
@@ -114,6 +119,10 @@ private fun ConversationContent(
 
     var selectedImageUri by remember {
         mutableStateOf<Uri?>(null)
+    }
+
+    var editingMessageId by remember {
+        mutableStateOf<String?>(null)
     }
 
     val imagePickerLauncher =
@@ -205,7 +214,15 @@ private fun ConversationContent(
 
                     MessageItem(
                         message = message,
-                        selectedUser = user
+                        selectedUser = user,
+                        onEdit = {
+                            typingJob?.cancel()
+                            onStopTyping(user._id)
+
+                            selectedImageUri = null
+                            editingMessageId = message._id
+                            messageText = message.text.orEmpty()
+                        }
                     )
                 }
             }
@@ -241,6 +258,22 @@ private fun ConversationContent(
             }
         }
 
+        if (editingMessageId != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Editing message")
+
+                TextButton(
+                    onClick = {
+                        editingMessageId = null
+                        messageText = ""
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -253,7 +286,8 @@ private fun ConversationContent(
                             ActivityResultContracts.PickVisualMedia.ImageOnly
                         )
                     )
-                }
+                },
+                enabled = editingMessageId == null
             ) {
                 Text("Image")
             }
@@ -284,7 +318,13 @@ private fun ConversationContent(
                 },
                 modifier = Modifier.weight(1f),
                 placeholder = {
-                    Text("Type a message...")
+                    Text(
+                        if (editingMessageId != null) {
+                            "Edit message..."
+                        } else {
+                            "Type a message..."
+                        }
+                    )
                 },
                 singleLine = true
             )
@@ -295,8 +335,24 @@ private fun ConversationContent(
 
             Button(
                 onClick = {
+                    val messageId = editingMessageId
 
-                    if (messageText.isNotBlank() || selectedImageUri != null) {
+                    if (messageId != null) {
+
+                        if (messageText.isNotBlank()) {
+                            onEditMessage(
+                                messageId,
+                                messageText.trim()
+                            )
+
+                            editingMessageId = null
+                            messageText = ""
+                        }
+
+                    } else if (
+                        messageText.isNotBlank() ||
+                        selectedImageUri != null
+                    ) {
 
                         typingJob?.cancel()
                         onStopTyping(user._id)
@@ -318,7 +374,9 @@ private fun ConversationContent(
                     }
                 }
             ) {
-                Text("Send")
+                Text(
+                    if (editingMessageId != null) "Save" else "Send"
+                )
             }
         }
 
@@ -326,14 +384,21 @@ private fun ConversationContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun MessageItem(
     message: Message,
-    selectedUser: User
+    selectedUser: User,
+    onEdit: () -> Unit
 ) {
 
-    val receivedMessage =
-        message.senderId == selectedUser._id
+    val receivedMessage = message.senderId == selectedUser._id
+
+    var showEditMenu by remember {
+        mutableStateOf(false)
+    }
+
+    val canEdit = !receivedMessage && !message.text.isNullOrBlank()
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -345,58 +410,84 @@ private fun MessageItem(
             }
     ) {
 
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            tonalElevation = 2.dp
-        ) {
+        Box {
 
-            Column(
-                modifier = Modifier
-                    .padding(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    )
-                    .widthIn(max = 280.dp)
+            Surface(
+                modifier = Modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        if (canEdit) {
+                            showEditMenu = true
+                        }
+                    }
+                ),
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 2.dp
             ) {
 
-                if (!message.image.isNullOrBlank()) {
-
-                    AsyncImage(
-                        model = message.image,
-                        contentDescription = "Message image",
-                        modifier = Modifier
-                            .width(220.dp)
-                            .height(220.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-                if (!message.text.isNullOrBlank()) {
+                Column(
+                    modifier = Modifier
+                        .padding(
+                            horizontal = 12.dp,
+                            vertical = 8.dp
+                        )
+                        .widthIn(max = 280.dp)
+                ) {
 
                     if (!message.image.isNullOrBlank()) {
-                        Spacer(
-                            modifier = Modifier.height(8.dp)
+
+                        AsyncImage(
+                            model = message.image,
+                            contentDescription = "Message image",
+                            modifier = Modifier
+                                .width(220.dp)
+                                .height(220.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
                         )
                     }
 
-                    Text(
-                        text = message.text
-                    )
+                    if (!message.text.isNullOrBlank()) {
+
+                        if (!message.image.isNullOrBlank()) {
+                            Spacer(
+                                modifier = Modifier.height(8.dp)
+                            )
+                        }
+
+                        Text(
+                            text = message.text
+                        )
+                    }
+
+                    if (message.edited) {
+
+                        Spacer(
+                            modifier = Modifier.height(2.dp)
+                        )
+
+                        Text(
+                            text = "edited",
+                            style =
+                                MaterialTheme.typography.labelSmall
+                        )
+                    }
                 }
+            }
 
-                if (message.edited) {
-
-                    Spacer(
-                        modifier = Modifier.height(2.dp)
-                    )
-
-                    Text(
-                        text = "edited",
-                        style =
-                            MaterialTheme.typography.labelSmall
-                    )
+            DropdownMenu(
+                expanded = showEditMenu,
+                onDismissRequest = {
+                    showEditMenu = false
                 }
+            ) {
+                DropdownMenuItem(
+                    text = { Text("Edit") },
+                    onClick = {
+                        showEditMenu = false
+                        onEdit()
+                    }
+                )
             }
         }
     }

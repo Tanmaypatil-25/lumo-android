@@ -43,6 +43,12 @@ fun HomeScreen(
             onTyping = { receiverId ->
                 chatViewModel.startTyping(receiverId)
             },
+            onEditMessage = { messageId, newText ->
+                chatViewModel.editMessage(
+                    messageId = messageId,
+                    newText = newText
+                )
+            },
             onStopTyping = { receiverId ->
                 chatViewModel.stopTyping(receiverId)
             }

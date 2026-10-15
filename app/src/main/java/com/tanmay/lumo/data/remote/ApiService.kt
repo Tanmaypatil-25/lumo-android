@@ -18,6 +18,8 @@ import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import okhttp3.MultipartBody
+import com.tanmay.lumo.data.model.EditMessageRequest
+import com.tanmay.lumo.data.model.EditMessageResponse
 
 interface ApiService {
 
@@ -50,6 +52,12 @@ interface ApiService {
     suspend fun markMessageAsSeen(
         @Path("messageId") messageId: String
     ): Response<Unit>
+
+    @PUT("api/messages/edit/{messageId}")
+    suspend fun editMessage(
+        @Path("messageId") messageId: String,
+        @Body request: EditMessageRequest
+    ): Response<EditMessageResponse>
 
     @Multipart
     @POST("api/messages/send/{userId}")
