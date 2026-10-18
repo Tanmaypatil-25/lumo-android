@@ -18,10 +18,18 @@ object SocketManager {
 
     private var onMessageSeenListener: ((String) -> Unit)? = null
 
+    private var onMessageEditedListener: ((String, String, Boolean) -> Unit)? = null
+
     fun setOnMessageSeenListener(
         listener: (String) -> Unit
     ) {
         onMessageSeenListener = listener
+    }
+
+    fun setOnMessageEditedListener(
+        listener: (String, String, Boolean) -> Unit
+    ) {
+        onMessageEditedListener = listener
     }
 
     private var onOnlineUsersListener: ((List<String>) -> Unit)? = null
@@ -130,6 +138,28 @@ object SocketManager {
 
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to process messageSeen", e)
+                }
+            }
+
+            socket?.on("messageEdited") { args ->
+                try {
+                    val data = args.firstOrNull() as? org.json.JSONObject
+
+                    if (data != null) {
+                        val messageId = data.getString("messageId")
+                        val text = data.getString("text")
+                        val edited = data.optBoolean("edited", true)
+
+                        Log.d(TAG, "Message edited: $messageId")
+
+                        onMessageEditedListener?.invoke(
+                            messageId,
+                            text,
+                            edited
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to process messageEdited", e)
                 }
             }
 

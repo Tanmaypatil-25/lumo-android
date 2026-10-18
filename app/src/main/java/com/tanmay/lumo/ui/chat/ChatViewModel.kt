@@ -92,6 +92,25 @@ class ChatViewModel : ViewModel() {
             }
         }
 
+        SocketManager.setOnMessageEditedListener { messageId, text, edited ->
+            val currentState = _conversationState.value
+
+            if (currentState is ConversationUiState.Success) {
+                _conversationState.value = currentState.copy(
+                    messages = currentState.messages.map { message ->
+                        if (message._id == messageId) {
+                            message.copy(
+                                text = text,
+                                edited = edited
+                            )
+                        } else {
+                            message
+                        }
+                    }
+                )
+            }
+        }
+
         SocketManager.setOnMessageSeenListener { messageId ->
 
             val currentState = _conversationState.value
