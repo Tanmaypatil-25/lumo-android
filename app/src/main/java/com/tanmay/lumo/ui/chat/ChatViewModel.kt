@@ -111,6 +111,18 @@ class ChatViewModel : ViewModel() {
             }
         }
 
+        SocketManager.setOnMessageDeletedListener { messageId ->
+            val currentState = _conversationState.value
+
+            if (currentState is ConversationUiState.Success) {
+                _conversationState.value = currentState.copy(
+                    messages = currentState.messages.filter { message ->
+                        message._id != messageId
+                    }
+                )
+            }
+        }
+
         SocketManager.setOnMessageSeenListener { messageId ->
 
             val currentState = _conversationState.value
@@ -353,6 +365,31 @@ class ChatViewModel : ViewModel() {
                     }
                 }
 
+            } catch (e: Exception) {
+                // Proper error handling will be added
+                // during the stability pass.
+            }
+        }
+    }
+
+    fun deleteMessage(messageId: String) {
+        val currentState = _conversationState.value
+        if (currentState !is ConversationUiState.Success) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val response = repository.deleteMessage(messageId)
+
+                if (response.isSuccessful) {
+                    val latestState = _conversationState.value
+                    if (latestState is ConversationUiState.Success) {
+                        _conversationState.value = latestState.copy(
+                            messages = latestState.messages.filter { it._id != messageId }
+                        )
+                    }
+                }
             } catch (e: Exception) {
                 // Proper error handling will be added
                 // during the stability pass.

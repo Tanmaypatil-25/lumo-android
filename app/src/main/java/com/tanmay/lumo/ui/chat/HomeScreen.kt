@@ -49,6 +49,9 @@ fun HomeScreen(
                     newText = newText
                 )
             },
+            onDeleteMessage = { messageId ->
+                chatViewModel.deleteMessage(messageId)
+            },
             onStopTyping = { receiverId ->
                 chatViewModel.stopTyping(receiverId)
             }

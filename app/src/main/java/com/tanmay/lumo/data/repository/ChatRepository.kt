@@ -58,6 +58,12 @@ class ChatRepository(
         )
     }
 
+    suspend fun deleteMessage(
+        messageId: String
+    ): Response<Unit> {
+        return apiService.deleteMessage(messageId)
+    }
+
     suspend fun markMessageAsSeen(
         messageId: String
     ): Response<Unit> {

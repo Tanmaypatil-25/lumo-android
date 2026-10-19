@@ -42,6 +42,7 @@ fun ConversationScreen(
     onTyping: (String) -> Unit,
     onStopTyping: (String) -> Unit,
     onEditMessage: (String, String) -> Unit,
+    onDeleteMessage: (String) -> Unit,
 ) {
 
     when (state) {
@@ -91,6 +92,7 @@ fun ConversationScreen(
                 onBack = onBack,
                 onSendMessage = onSendMessage,
                 onEditMessage = onEditMessage,
+                onDeleteMessage = onDeleteMessage,
                 isOnline = state.selectedUser._id in onlineUsers,
                 isTyping = state.selectedUser._id in typingUsers,
                 onTyping = onTyping,
@@ -107,6 +109,7 @@ private fun ConversationContent(
     onBack: () -> Unit,
     onSendMessage: (String, MultipartBody.Part?) -> Unit,
     onEditMessage: (String, String) -> Unit,
+    onDeleteMessage: (String) -> Unit,
     isOnline: Boolean,
     isTyping: Boolean,
     onTyping: (String) -> Unit,
@@ -222,6 +225,13 @@ private fun ConversationContent(
                             selectedImageUri = null
                             editingMessageId = message._id
                             messageText = message.text.orEmpty()
+                        },
+                        onDelete = {
+                            if (editingMessageId == message._id) {
+                                editingMessageId = null
+                                messageText = ""
+                            }
+                            onDeleteMessage(message._id)
                         }
                     )
                 }
@@ -389,15 +399,17 @@ private fun ConversationContent(
 private fun MessageItem(
     message: Message,
     selectedUser: User,
-    onEdit: () -> Unit
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
 
     val receivedMessage = message.senderId == selectedUser._id
 
-    var showEditMenu by remember {
+    var showMenu by remember {
         mutableStateOf(false)
     }
 
+    val canDelete = !receivedMessage
     val canEdit = !receivedMessage && !message.text.isNullOrBlank()
 
     Row(
@@ -416,8 +428,8 @@ private fun MessageItem(
                 modifier = Modifier.combinedClickable(
                     onClick = {},
                     onLongClick = {
-                        if (canEdit) {
-                            showEditMenu = true
+                        if (canDelete) {
+                            showMenu = true
                         }
                     }
                 ),
@@ -476,16 +488,26 @@ private fun MessageItem(
             }
 
             DropdownMenu(
-                expanded = showEditMenu,
+                expanded = showMenu,
                 onDismissRequest = {
-                    showEditMenu = false
+                    showMenu = false
                 }
             ) {
+                if (canEdit) {
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        onClick = {
+                            showMenu = false
+                            onEdit()
+                        }
+                    )
+                }
+
                 DropdownMenuItem(
-                    text = { Text("Edit") },
+                    text = { Text("Delete") },
                     onClick = {
-                        showEditMenu = false
-                        onEdit()
+                        showMenu = false
+                        onDelete()
                     }
                 )
             }

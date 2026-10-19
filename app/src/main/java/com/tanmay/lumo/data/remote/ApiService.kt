@@ -20,6 +20,7 @@ import retrofit2.http.Part
 import okhttp3.MultipartBody
 import com.tanmay.lumo.data.model.EditMessageRequest
 import com.tanmay.lumo.data.model.EditMessageResponse
+import retrofit2.http.DELETE
 
 interface ApiService {
 
@@ -66,5 +67,10 @@ interface ApiService {
         @Part("text") text: RequestBody,
         @Part image: MultipartBody.Part? = null
     ): Response<SendMessageResponse>
+
+    @DELETE("api/messages/{messageId}")
+    suspend fun deleteMessage(
+        @Path("messageId") messageId: String
+    ): Response<Unit>
 
 }

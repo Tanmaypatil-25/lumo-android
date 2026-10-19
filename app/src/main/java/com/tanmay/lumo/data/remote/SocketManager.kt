@@ -32,6 +32,14 @@ object SocketManager {
         onMessageEditedListener = listener
     }
 
+    private var onMessageDeletedListener: ((String) -> Unit)? = null
+
+    fun setOnMessageDeletedListener(
+        listener: (String) -> Unit
+    ) {
+        onMessageDeletedListener = listener
+    }
+
     private var onOnlineUsersListener: ((List<String>) -> Unit)? = null
 
     private var latestOnlineUsers: List<String> = emptyList()
@@ -160,6 +168,22 @@ object SocketManager {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to process messageEdited", e)
+                }
+            }
+
+            socket?.on("messageDeleted") { args ->
+                try {
+                    val data = args.firstOrNull() as? org.json.JSONObject
+
+                    if (data != null) {
+                        val messageId = data.getString("messageId")
+
+                        Log.d(TAG, "Message deleted: $messageId")
+
+                        onMessageDeletedListener?.invoke(messageId)
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to process messageDeleted", e)
                 }
             }
 
