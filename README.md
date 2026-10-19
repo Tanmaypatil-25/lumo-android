@@ -312,20 +312,34 @@ The original full-stack messaging application built with the MERN stack and Sock
 
 The Web and Android clients share the same backend, enabling cross-platform messaging and synchronized conversation state.
 
+---
+
 ## Author
 
 <div align="center">
 
 ### Tanmay Patil
 
-Full-Stack Web & Android Developer
-
+Full-Stack Web & Android Developer  
 Information Technology Undergraduate
+
+<br />
 
 [![GitHub](https://img.shields.io/badge/GitHub-Tanmaypatil--25-181717?style=for-the-badge&logo=github)](https://github.com/Tanmaypatil-25)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Tanmay_Patil-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tanmayppatil25/)
+[![LeetCode](https://img.shields.io/badge/LeetCode-tanmaypatil__25-FFA116?style=for-the-badge&logo=leetcode&logoColor=black)](https://leetcode.com/u/tanmaypatil_25/)
+
+</div>
 
 ---
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/Tanmaypatil-25/Lumo/main/client/src/assets/branding/lumo-mark.svg" alt="Lumo Logo" width="45" />
+
+### Lumo Android
+
+**Native Android client built with Kotlin & Jetpack Compose**
 
 <sub>Designed and developed by Tanmay Patil.</sub>
 
