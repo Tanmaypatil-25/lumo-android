@@ -1,14 +1,12 @@
-# Lumo Android
-
-<div align="center">
+ <div align="center">
 
 <img src="https://raw.githubusercontent.com/Tanmaypatil-25/Lumo/main/client/src/assets/branding/lumo-mark.svg" alt="Lumo Logo" width="90" />
 
-# Lumo Android
+<h1>Lumo Android</h1>
 
-### Real-time conversations, natively built for Android.
+<h3>Real-time conversations, natively built for Android.</h3>
 
-A native Android messaging client built with **Kotlin and Jetpack Compose**, connected to the existing Lumo backend to deliver real-time conversations, persistent authentication, media sharing, message management, and synchronized messaging across Android and Web.
+A native Android messaging client built with **Kotlin and Jetpack Compose**, connected to the existing Lumo backend for real-time conversations, persistent authentication, media sharing, and synchronized messaging across Android and Web.
 
 [![Android](https://img.shields.io/badge/Platform-Android-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://developer.android.com/)
 [![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)](https://kotlinlang.org/)
@@ -16,115 +14,35 @@ A native Android messaging client built with **Kotlin and Jetpack Compose**, con
 [![Socket.IO](https://img.shields.io/badge/Real--Time-Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io/)
 
 [![Source Code](https://img.shields.io/badge/Source_Code-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Tanmaypatil-25/lumo-android)
-[![Related Project](https://img.shields.io/badge/Lumo_Web-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://lumo-chat-tanmay.vercel.app/)
+[![Lumo Web](https://img.shields.io/badge/Lumo_Web-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://lumo-chat-tanmay.vercel.app/)
 
 </div>
 
 ---
 
-## About Lumo Android
+## About
 
-**Lumo Android** brings the Lumo messaging ecosystem to Android through a native application built using Kotlin and Jetpack Compose.
+**Lumo Android** brings the Lumo messaging ecosystem to Android through a native application developed using Kotlin and Jetpack Compose.
 
-Rather than introducing a separate mobile backend, the Android client communicates with the existing Lumo infrastructure. Authentication, conversations, message history, media storage, and real-time events are shared with the web application.
+Instead of maintaining a separate mobile backend, the application connects to the existing Lumo infrastructure. Both Android and Web share authentication, conversations, message history, media storage, and real-time messaging events.
 
-The application follows a layered, MVVM-style architecture that separates the UI, application state, repositories, networking, local session persistence, and real-time communication.
-
-The goal is to build a maintainable native Android client while keeping the messaging experience consistent across platforms.
-
----
+The application follows a layered, MVVM-style architecture with a focus on separation of concerns, reactive state management, and cross-platform consistency.
 
 ## Features
 
-- Native Android interface built with Jetpack Compose
-- Login and signup with JWT authentication
-- Persistent sessions and automatic authentication restoration
-- Real-time one-to-one messaging
-- Message editing and deletion
-- Online presence and typing indicators
-- Sent and Seen status synchronization
-- Unread message tracking
-- Image messaging with local previews
-- Cloudinary-backed media storage
-- Android ↔ Web real-time synchronization
-- Reactive UI state using Kotlin StateFlow
-- Retrofit-based networking with Gson serialization
-
-<details>
-<summary><strong>View complete feature list</strong></summary>
-
-### Authentication & Session Management
-
-- User login and signup
-- JWT-based authentication
-- Authenticated API requests
-- Persistent local session storage
-- Automatic session restoration on application launch
-- Reactive authentication state using StateFlow
-- Logout and local session cleanup
-- Backend API error handling
-
-### Real-Time Messaging
-
-- One-to-one conversations
-- Real-time text message delivery
-- Conversation history retrieval
-- Android-to-Web message synchronization
-- Web-to-Android message synchronization
-- Real-time message updates
-- Message editing and deletion
-- Sent and Seen state synchronization
-- Unread message counts
-- Unread-state reset when opening a conversation
-- Paginated conversation state
-
-### Presence & Typing
-
-- Online/offline presence indicators
-- Cached presence state for UI listeners
-- Real-time typing indicators
-- Debounced typing events
-- `typing` and `stopTyping` event handling
-- Authenticated Socket.IO connections
-- Socket lifecycle management
-- Reconnection handling
-
-### Media Messaging
-
-- Android Photo Picker integration
-- Local image selection using content URIs
-- Image preview using Coil
-- Image removal before sending
-- Multipart image uploads using Retrofit
-- Backend media processing through Multer
-- Cloudinary-powered image storage
-- Remote image rendering using Coil
-- Real-time image message delivery
-- Image messages shared between Android and Web
-
-### Message Management
-
-- Editing previously sent messages
-- Deleting previously sent messages
-- Backend-backed message operations
-- Synchronization of message changes across connected clients
-- Repository-driven message operations
-- Reactive conversation state updates
-
-### Architecture & State Management
-
-- MVVM-style layered architecture
-- Repository-based data access
-- Kotlin Coroutines
-- StateFlow-driven UI updates
-- Separation of Compose UI from networking logic
-- Centralized Retrofit configuration
-- Build-configuration-based backend URL
-- Shared backend infrastructure with Lumo Web
-
-</details>
-
----
+- **Native Android UI** built with Kotlin and Jetpack Compose
+- **Authentication** with login, signup, and JWT-based sessions
+- **Persistent sessions** with automatic authentication restoration
+- **Real-time messaging** with synchronized conversations
+- **Message editing and deletion** with backend-backed updates
+- **Online presence and typing indicators**
+- **Sent and Seen status synchronization**
+- **Unread message tracking**
+- **Image messaging** with local previews and remote rendering
+- **Cloudinary media storage** through the existing backend
+- **Android ↔ Web synchronization** using shared infrastructure
+- **Reactive UI state** powered by Kotlin Coroutines and StateFlow
+- **REST API integration** using Retrofit and Gson
 
 ## Tech Stack
 
@@ -138,384 +56,180 @@ The goal is to build a maintainable native Android client while keeping the mess
 | Kotlin Coroutines | Asynchronous operations |
 | StateFlow | Reactive application state |
 | Retrofit | REST API communication |
-| Gson | JSON serialization and deserialization |
+| Gson | JSON serialization |
 | Socket.IO Client | Real-time communication |
 | Coil | Local preview and remote image loading |
 | Android Photo Picker | Image selection |
-| Android persistence layer | Session persistence |
+| SessionManager | Local session persistence |
 
 ### Backend & Infrastructure
 
 | Technology | Purpose |
 | --- | --- |
-| Node.js | Server runtime |
-| Express.js | REST API |
-| MongoDB | Persistent application data |
-| Mongoose | MongoDB object modeling |
+| Node.js and Express.js | Backend runtime and REST API |
+| MongoDB and Mongoose | Persistent data storage |
 | JWT | Authentication |
 | Socket.IO | Real-time events |
 | Multer | Multipart media processing |
 | Cloudinary | Image storage and delivery |
 | Vercel | Lumo Web deployment |
 
-The Android client reuses the existing Lumo backend rather than maintaining a separate API or database.
-
----
+The Android client reuses the existing Lumo backend instead of maintaining a separate API or database.
 
 ## Architecture
 
-Lumo Android separates presentation, application state, data access, networking, and real-time communication into distinct layers.
+Lumo Android separates presentation, application state, data access, and communication into distinct layers.
 
 ```text
-┌───────────────────────────────────────┐
-│           Jetpack Compose UI          │
-│                                       │
-│     Login · Signup · Home · Chat      │
-└───────────────────┬───────────────────┘
-                    │
-                    ▼
-┌───────────────────────────────────────┐
-│              ViewModels               │
-│                                       │
-│      Application Logic · StateFlow    │
-└───────────────────┬───────────────────┘
-                    │
-                    ▼
-┌───────────────────────────────────────┐
-│              Repositories             │
-│                                       │
-│     Authentication · Chat Operations  │
-└───────────────┬───────────────┬───────┘
+┌─────────────────────────────────────┐
+│          Jetpack Compose UI         │
+│       Login · Home · Chat            │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│             ViewModels              │
+│       Application Logic · StateFlow  │
+└──────────────────┬──────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────┐
+│             Repositories             │
+│     Authentication · Chat Operations │
+└───────────────┬───────────────┬─────┘
                 │               │
                 ▼               ▼
-       ┌────────────────┐ ┌────────────────┐
-       │   ApiService   │ │  SocketManager │
-       │                │ │                │
-       │ Retrofit APIs  │ │ Socket.IO      │
-       └────────┬───────┘ └────────┬───────┘
-                │                  │
-                └────────┬─────────┘
-                         │
-                         ▼
-              ┌─────────────────────┐
-              │    Lumo Backend     │
-              │                     │
-              │ Express · MongoDB   │
-              │ JWT · Socket.IO     │
-              │ Cloudinary          │
-              └─────────────────────┘
+        ┌──────────────┐ ┌──────────────┐
+        │  ApiService  │ │SocketManager │
+        │   Retrofit   │ │  Socket.IO   │
+        └──────┬───────┘ └──────┬───────┘
+               │                │
+               └────────┬───────┘
+                        │
+                        ▼
+             ┌─────────────────────┐
+             │    Lumo Backend     │
+             │ Express · MongoDB   │
+             │ JWT · Socket.IO     │
+             │ Cloudinary          │
+             └─────────────────────┘
 ```
 
-### Presentation Layer
+### How the layers work
 
-Jetpack Compose provides the native interface for authentication, conversation navigation, message display, and chat interactions.
+- **Presentation:** Jetpack Compose renders authentication screens, conversations, messages, and chat interactions.
+- **ViewModels:** Coordinate application operations and expose observable state through StateFlow.
+- **Repositories:** Separate application logic from networking and coordinate authentication and messaging operations.
+- **Networking:** Retrofit handles REST requests, while SocketManager manages real-time communication.
+- **Persistence:** SessionManager maintains authentication information across application launches.
 
-The UI observes state exposed by ViewModels rather than performing networking or socket operations directly.
+## Authentication & Session Management
 
-### ViewModel Layer
+The application uses the existing Lumo backend for authentication.
 
-ViewModels coordinate application operations and expose observable state through Kotlin StateFlow.
+- Users can log in or sign up through the Android interface.
+- Authenticated API requests use JWT-based authentication.
+- Session information is persisted locally.
+- Existing sessions are restored when the application launches.
+- Logging out clears the local session and resets authenticated application state.
 
-This allows Compose to react to authentication changes, incoming messages, presence updates, and conversation changes.
+## Real-Time Messaging
 
-### Repository Layer
+Socket.IO enables real-time communication between the Android application and the shared Lumo backend.
 
-Repositories coordinate data operations and separate application logic from the underlying networking implementation.
+Supported messaging capabilities include:
 
-Authentication and chat operations are handled through dedicated repository classes.
+- Real-time message delivery
+- Message editing and deletion
+- Online and offline presence
+- Typing indicators
+- Sent and Seen status synchronization
+- Unread message counts and state updates
+- Conversation synchronization between Android and Web
 
-### Networking Layer
+Message operations are coordinated through the application's repositories and networking layer. Backend-backed changes can be reflected across connected clients through the shared messaging infrastructure.
 
-Retrofit handles REST operations such as authentication, user discovery, conversation retrieval, message operations, and media uploads.
-
-SocketManager encapsulates the Socket.IO connection for real-time events and synchronization.
-
-### Persistence Layer
-
-The local session manager maintains authentication state between application launches, allowing the application to restore an existing session without requiring the user to log in again.
-
----
-
-## Authentication Flow
-
-Authentication uses the existing Lumo backend and JWT-based session management.
-
-```text
-User Credentials
-       │
-       ▼
- Login / Signup Screen
-       │
-       ▼
-   AuthViewModel
-       │
-       ▼
-  AuthRepository
-       │
-       ▼
- ApiService · Retrofit
-       │
-       ▼
-    Lumo Backend
-       │
-       ▼
-    JWT + User Data
-       │
-       ▼
-   SessionManager
-       │
-       ▼
- Authenticated Application
-```
-
-After successful authentication, session information is persisted locally.
-
-On subsequent launches, the application restores the saved session and initializes the authenticated application flow.
-
-Logging out clears the local session and resets the authenticated application state.
-
----
-
-## Real-Time Communication
-
-Socket.IO enables immediate synchronization between the Android application and the Lumo backend.
-
-Current real-time capabilities include:
-
-```text
-Authenticated Socket Connection
-             │
-             ├── New Messages
-             │
-             ├── Message Updates
-             │
-             ├── Message Deletion
-             │
-             ├── Online Presence
-             │
-             ├── Typing Indicators
-             │
-             └── Seen State
-```
-
-### Message Delivery
-
-When a message is sent, the backend handles message persistence and real-time delivery. Connected clients receive updates through the existing messaging infrastructure.
-
-### Message Editing & Deletion
-
-The Android client supports editing and deleting previously sent messages.
-
-Message operations are coordinated through the application’s chat and networking layers, with updates synchronized through the shared backend and real-time infrastructure.
-
-### Presence & Typing
-
-Online presence and typing indicators are synchronized through Socket.IO.
-
-Typing events are debounced to reduce unnecessary event traffic, while presence state is maintained so UI listeners can access the latest known online-user information.
-
-### Read Receipts & Unread Messages
-
-The application tracks unread messages and synchronizes Seen state with the backend.
-
-Opening a conversation resets its unread state, allowing the conversation list and active chat to reflect the latest messaging activity.
-
----
-
-## Image Messaging Pipeline
+## Image Messaging
 
 Lumo Android supports image messaging through the Android Photo Picker, Retrofit multipart requests, Cloudinary, and Coil.
 
-```text
-Android Photo Picker
-         │
-         ▼
-    Selected URI
-         │
-         ▼
-   Local Coil Preview
-         │
-         ▼
-  Multipart Upload
-         │
-         ▼
-  Retrofit + Repository
-         │
-         ▼
-     Express API
-         │
-         ▼
-       Multer
-         │
-         ▼
-     Cloudinary
-         │
-         ▼
- Persisted Message
-         │
-         ▼
-     Socket.IO
-         │
-         ▼
-   Recipient Client
-         │
-         ▼
-  Remote Coil Rendering
-```
+The image handling process includes:
 
-Users can select an image and preview it locally before sending.
+1. Select an image using the Android Photo Picker.
+2. Preview the selected image locally.
+3. Upload the image through a multipart request.
+4. Process and store the media through the existing backend and Cloudinary.
+5. Persist the associated message and deliver updates through the messaging infrastructure.
+6. Render remote images in the Android conversation using Coil.
 
-The selected image is uploaded through a multipart request to the existing backend. The backend processes the upload, stores the media through Cloudinary, persists the associated message, and distributes the resulting message through the real-time messaging infrastructure.
+Users can preview or remove a selected image before sending it. Image messages use the same backend infrastructure as Lumo Web.
 
-Coil handles local previews and remote image rendering within the Android application.
+## Cross-Platform Messaging
 
----
+Lumo Android and Lumo Web are independent clients connected to the same messaging platform.
 
-## Cross-Platform Synchronization
-
-Lumo Android and Lumo Web are independent clients of the same messaging platform.
-
-```text
-             ┌──────────────────────┐
-             │    Lumo Backend      │
-             │                      │
-             │ REST API             │
-             │ MongoDB              │
-             │ JWT Authentication   │
-             │ Socket.IO            │
-             │ Cloudinary           │
-             └──────────┬───────────┘
-                        │
-                  REST + Socket.IO
-                        │
-             ┌──────────┴───────────┐
-             │                      │
-             ▼                      ▼
-    ┌────────────────┐     ┌────────────────┐
-    │    Lumo Web    │◄───►│  Lumo Android  │
-    │                │     │                │
-    │ React + Vite   │     │ Kotlin         │
-    │                │     │ Jetpack Compose│
-    └────────────────┘     └────────────────┘
-```
-
-Both clients share the same:
+Both clients share:
 
 - User accounts and authentication infrastructure
-- Backend and MongoDB database
+- Backend APIs and MongoDB data
 - Conversation and message history
-- Message read state
-- Real-time messaging infrastructure
-- Presence and typing events
+- Message editing and deletion operations
+- Read states and unread message tracking
+- Real-time messaging, presence, and typing events
 - Cloudinary media storage
 
-This architecture enables conversations to continue across Web and Android without maintaining separate messaging systems.
-
----
-
-## State Management
-
-Kotlin StateFlow is used to expose reactive application state from ViewModels to the Compose UI.
-
-```text
-REST Response / Socket Event
-             │
-             ▼
-         Repository
-             │
-             ▼
-          ViewModel
-             │
-             ▼
-          StateFlow
-             │
-             ▼
-       Compose UI Update
-```
-
-This approach keeps the interface driven by observable state rather than direct network operations.
-
-Conversation state includes information such as:
-
-- Selected conversation
-- Message history
-- Unread counts
-- Presence information
-- Typing state
-- Message updates and deletions
-- Pagination state
-
-The separation of concerns makes the application easier to maintain as new features are introduced.
-
----
+This allows conversations to continue across Android and Web without maintaining separate messaging systems.
 
 ## Project Structure
 
-The Android application follows a package structure organized around data access, remote communication, persistence, repositories, and UI.
+The project is organized around data models, local persistence, remote communication, repositories, and UI components.
 
 ```text
 lumo-android/
-│
 ├── app/
 │   └── src/
 │       └── main/
 │           ├── java/com/tanmay/lumo/
-│           │   │
 │           │   ├── data/
 │           │   │   ├── local/
 │           │   │   │   └── SessionManager.kt
-│           │   │   │
 │           │   │   ├── model/
-│           │   │   │   ├── AuthResponse.kt
-│           │   │   │   ├── LoginRequest.kt
-│           │   │   │   ├── SignupRequest.kt
 │           │   │   │   └── ...
-│           │   │   │
 │           │   │   ├── remote/
 │           │   │   │   ├── ApiService.kt
 │           │   │   │   ├── RetrofitClient.kt
 │           │   │   │   └── SocketManager.kt
-│           │   │   │
-│           │   │   └── repository/
-│           │   │       ├── AuthRepository.kt
-│           │   │       ├── ChatRepository.kt
-│           │   │       └── ...
-│           │   │
+│           │   │   ├── repository/
+│           │   │   │   ├── AuthRepository.kt
+│           │   │   │   ├── ChatRepository.kt
+│           │   │   │   └── ...
 │           │   ├── ui/
 │           │   │   ├── auth/
 │           │   │   │   ├── AuthViewModel.kt
 │           │   │   │   ├── LoginScreen.kt
 │           │   │   │   └── SignupScreen.kt
-│           │   │   │
 │           │   │   └── chat/
 │           │   │       ├── ChatViewModel.kt
 │           │   │       ├── HomeScreen.kt
 │           │   │       ├── ConversationScreen.kt
 │           │   │       └── ...
-│           │   │
 │           │   └── MainActivity.kt
-│           │
 │           └── AndroidManifest.xml
-│
 ├── gradle/
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── README.md
 ```
 
-The tree illustrates the major architectural areas; exact Gradle files and package locations may vary with the current repository structure.
-
----
+*This tree highlights the main architectural areas; individual files may change as development progresses.*
 
 ## Getting Started
 
 ### Prerequisites
 
-Make sure the development environment includes:
-
 - [Android Studio](https://developer.android.com/studio)
 - Android SDK compatible with the project's Gradle configuration
-- JDK compatible with the project's Gradle configuration
+- Compatible JDK
 - Git
 - Access to the Lumo backend
 
@@ -528,58 +242,33 @@ cd lumo-android
 
 ### 2. Open the Project
 
-Open the cloned project in Android Studio and allow Gradle synchronization to finish.
+Open the project in Android Studio and allow Gradle synchronization to finish.
 
 ### 3. Configure the Backend URL
 
-The Android client obtains its backend base URL through the application's build configuration instead of hardcoding it inside the networking layer.
+Configure the backend base URL through the project's existing build configuration or environment setup.
 
-Configure the URL using the project's existing build configuration or environment setup.
+For local development, make sure the backend is reachable from the Android device or emulator. An Android emulator commonly uses `10.0.2.2` to reach a server running on the host machine, rather than `localhost`.
 
-For a local development environment, ensure the URL is reachable from the Android device or emulator.
+Use the actual URL and port configured for the development environment.
 
-For example, an Android emulator commonly accesses a development server running on the host machine through `10.0.2.2`, rather than `localhost`.
+### 4. Start the Backend
 
-Use the actual backend URL and port configured for the development environment.
+Ensure the Lumo backend is running and configured with the required MongoDB, JWT, Cloudinary, and client-origin settings.
 
-### 4. Configure Backend Access
-
-Ensure the Lumo backend is running and accessible.
-
-The backend requires its own configuration for MongoDB, JWT authentication, Cloudinary, and permitted client origins. Follow the setup instructions in the [Lumo Web repository](https://github.com/Tanmaypatil-25/Lumo) for the shared backend infrastructure.
+Refer to the [Lumo Web repository](https://github.com/Tanmaypatil-25/Lumo) for the shared backend infrastructure and setup instructions.
 
 ### 5. Run the Application
 
-- Connect an Android device with USB debugging enabled, or start an Android emulator.
-- Select the desired device in Android Studio.
-- Build and run the application using the Run action.
+1. Connect an Android device with USB debugging enabled, or start an emulator.
+2. Select the device in Android Studio.
+3. Build and run the application.
 
-Once the application launches, sign in or create an account through the configured backend.
-
----
-
-## Engineering Focus
-
-Lumo Android is being developed with an emphasis on:
-
-- **Native Android development:** Kotlin and Jetpack Compose
-- **Separation of concerns:** UI, ViewModels, repositories, and remote data sources
-- **Reactive state management:** Coroutines and StateFlow
-- **Real-time reliability:** Authenticated Socket.IO communication and lifecycle management
-- **Cross-platform consistency:** A shared backend for Web and Android
-- **Session persistence:** Authentication state restored across launches
-- **Media handling:** URI-based image selection, multipart uploads, and remote rendering
-- **Maintainability:** Centralized networking and repository-driven operations
-
-The objective is to build a native mobile client that fits into the broader Lumo ecosystem while keeping application logic understandable, modular, and extensible.
-
----
+Once the application launches, sign in or create an account using the configured backend.
 
 ## Development Status
 
 **Lumo Android is under active development.**
-
-The application has progressed beyond the initial networking foundation and authentication flow into a functional real-time messaging client.
 
 ### Implemented
 
@@ -596,16 +285,14 @@ The application has progressed beyond the initial networking foundation and auth
 - [x] Real-time incoming messages
 - [x] Android ↔ Web message synchronization
 - [x] Online presence and typing indicators
-- [x] Sent / Seen synchronization
+- [x] Sent and Seen status synchronization
 - [x] Unread message tracking
 - [x] Image selection and local previews
 - [x] Multipart uploads and Cloudinary-backed media
 - [x] Remote image rendering
 - [x] Message editing and deletion
 
-### Future Development
-
-Potential areas for continued development include:
+### Future Improvements
 
 - Extended profile management
 - Additional conversation controls
@@ -614,21 +301,16 @@ Potential areas for continued development include:
 - Broader automated testing
 - Further reliability and production hardening
 
----
-
 ## Related Project
 
 ### Lumo Web
 
-The original full-stack messaging application built using the MERN stack and Socket.IO.
+The original full-stack messaging application built with the MERN stack and Socket.IO.
 
-[**View Lumo Web on GitHub →**](https://github.com/Tanmaypatil-25/Lumo)
-
-[**Try the Lumo Web application →**](https://lumo-chat-tanmay.vercel.app/)
+- **[View Lumo Web on GitHub →](https://github.com/Tanmaypatil-25/Lumo)**
+- **[Try the Lumo Web application →](https://lumo-chat-tanmay.vercel.app/)**
 
 The Web and Android clients share the same backend, enabling cross-platform messaging and synchronized conversation state.
-
----
 
 ## Author
 
@@ -643,17 +325,7 @@ Information Technology Undergraduate
 [![GitHub](https://img.shields.io/badge/GitHub-Tanmaypatil--25-181717?style=for-the-badge&logo=github)](https://github.com/Tanmaypatil-25)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Tanmay_Patil-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tanmayppatil25/)
 
-</div>
-
 ---
-
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/Tanmaypatil-25/Lumo/main/client/src/assets/branding/lumo-mark.svg" alt="Lumo" width="45" />
-
-### Lumo Android
-
-**Built with Kotlin, Jetpack Compose & the Lumo backend.**
 
 <sub>Designed and developed by Tanmay Patil.</sub>
 
