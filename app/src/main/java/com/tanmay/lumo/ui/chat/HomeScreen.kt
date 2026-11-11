@@ -54,7 +54,10 @@ fun HomeScreen(
             },
             onStopTyping = { receiverId ->
                 chatViewModel.stopTyping(receiverId)
-            }
+            },
+            onLoadOlderMessages = {
+                chatViewModel.loadOlderMessages()
+            },
         )
 
         return

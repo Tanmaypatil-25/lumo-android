@@ -30,6 +30,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.snapshotFlow
 
 
 @Composable
@@ -43,6 +45,7 @@ fun ConversationScreen(
     onStopTyping: (String) -> Unit,
     onEditMessage: (String, String) -> Unit,
     onDeleteMessage: (String) -> Unit,
+    onLoadOlderMessages: () -> Unit,
 ) {
 
     when (state) {
@@ -96,7 +99,8 @@ fun ConversationScreen(
                 isOnline = state.selectedUser._id in onlineUsers,
                 isTyping = state.selectedUser._id in typingUsers,
                 onTyping = onTyping,
-                onStopTyping = onStopTyping
+                onStopTyping = onStopTyping,
+                onLoadOlderMessages = onLoadOlderMessages,
             )
         }
     }
@@ -113,7 +117,8 @@ private fun ConversationContent(
     isOnline: Boolean,
     isTyping: Boolean,
     onTyping: (String) -> Unit,
-    onStopTyping: (String) -> Unit
+    onStopTyping: (String) -> Unit,
+    onLoadOlderMessages: () -> Unit,
 ) {
 
     var messageText by remember {
@@ -144,6 +149,18 @@ private fun ConversationContent(
 
     var typingJob by remember {
         mutableStateOf<Job?>(null)
+    }
+
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.firstVisibleItemIndex
+        }.collect { firstVisibleIndex ->
+            if (firstVisibleIndex <= 3) {
+                onLoadOlderMessages()
+            }
+        }
     }
 
     Column(
@@ -205,9 +222,9 @@ private fun ConversationContent(
         } else {
 
             LazyColumn(
+                state = listState,
                 modifier = Modifier.weight(1f),
-                verticalArrangement =
-                    Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
                 items(
