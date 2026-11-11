@@ -46,6 +46,8 @@ class ChatViewModel : ViewModel() {
     val typingUsers: StateFlow<Set<String>> =
         _typingUsers.asStateFlow()
 
+    private var isLoadingOlderMessages = false
+
     init {
         SocketManager.setOnNewMessageListener { message ->
 
@@ -212,6 +214,8 @@ class ChatViewModel : ViewModel() {
 
     fun selectUser(user: User) {
 
+        isLoadingOlderMessages = false
+
         viewModelScope.launch {
 
             _conversationState.value =
@@ -272,9 +276,65 @@ class ChatViewModel : ViewModel() {
         }
     }
 
+
+    fun loadOlderMessages() {
+        val currentState = _conversationState.value
+
+        if (currentState !is ConversationUiState.Success) return
+        if (!currentState.hasMore) return
+        if (isLoadingOlderMessages) return
+
+        val userId = currentState.selectedUser._id
+        val cursor = currentState.nextCursor ?: return
+
+        isLoadingOlderMessages = true
+
+        viewModelScope.launch {
+            try {
+                val response = repository.getMessages(
+                    userId = userId,
+                    before = cursor
+                )
+
+                if (response.isSuccessful) {
+                    val body = response.body() ?: return@launch
+
+                    val latestState = _conversationState.value
+
+                    // Ignore the response if the user switched conversations.
+                    if (
+                        latestState !is ConversationUiState.Success ||
+                        latestState.selectedUser._id != userId
+                    ) {
+                        return@launch
+                    }
+
+                    val existingIds = latestState.messages
+                        .map { it._id }
+                        .toSet()
+
+                    val olderMessages = body.messages.filter {
+                        it._id !in existingIds
+                    }
+
+                    _conversationState.value = latestState.copy(
+                        messages = olderMessages + latestState.messages,
+                        hasMore = body.hasMore,
+                        nextCursor = body.nextCursor
+                    )
+                }
+            } catch (e: Exception) {
+                // Keep existing messages; allow retry later.
+            } finally {
+                isLoadingOlderMessages = false
+            }
+        }
+    }
+
+
     fun closeConversation() {
-        _conversationState.value =
-            ConversationUiState.Idle
+        isLoadingOlderMessages = false
+        _conversationState.value = ConversationUiState.Idle
     }
 
     fun sendMessage(
