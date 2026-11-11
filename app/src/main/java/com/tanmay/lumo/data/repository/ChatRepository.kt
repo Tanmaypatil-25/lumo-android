@@ -20,11 +20,15 @@ class ChatRepository(
     }
 
     suspend fun getMessages(
-        userId: String
+        userId: String,
+        limit: Int = 30,
+        before: String? = null
     ): Response<MessagesResponse> {
 
         return apiService.getMessages(
-            userId = userId
+            userId = userId,
+            limit = limit,
+            before = before
         )
     }
 
