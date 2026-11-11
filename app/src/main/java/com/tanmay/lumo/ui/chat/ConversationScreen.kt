@@ -101,6 +101,8 @@ fun ConversationScreen(
                 onTyping = onTyping,
                 onStopTyping = onStopTyping,
                 onLoadOlderMessages = onLoadOlderMessages,
+                isLoadingOlderMessages = state.isLoadingOlderMessages,
+                hasMore = state.hasMore,
             )
         }
     }
@@ -119,6 +121,8 @@ private fun ConversationContent(
     onTyping: (String) -> Unit,
     onStopTyping: (String) -> Unit,
     onLoadOlderMessages: () -> Unit,
+    isLoadingOlderMessages: Boolean,
+    hasMore: Boolean,
 ) {
 
     var messageText by remember {
@@ -151,13 +155,25 @@ private fun ConversationContent(
         mutableStateOf<Job?>(null)
     }
 
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(
+        initialFirstVisibleItemIndex = messages.lastIndex.coerceAtLeast(0)
+    )
 
+    val currentHasMore by rememberUpdatedState(hasMore)
+    val currentIsLoading by rememberUpdatedState(isLoadingOlderMessages)
+    val currentOnLoad by rememberUpdatedState(onLoadOlderMessages)
+
+    // Detect when the user reaches the older messages boundary.
     LaunchedEffect(listState) {
         snapshotFlow {
             listState.firstVisibleItemIndex
         }.collect { firstVisibleIndex ->
-            if (firstVisibleIndex <= 3) {
+
+            if (
+                firstVisibleIndex <= 3 &&
+                hasMore &&
+                !isLoadingOlderMessages
+            ) {
                 onLoadOlderMessages()
             }
         }

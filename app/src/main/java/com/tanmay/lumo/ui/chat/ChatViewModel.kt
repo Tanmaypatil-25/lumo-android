@@ -48,6 +48,8 @@ class ChatViewModel : ViewModel() {
 
     private var isLoadingOlderMessages = false
 
+    private var conversationGeneration = 0
+
     init {
         SocketManager.setOnNewMessageListener { message ->
 
@@ -214,6 +216,7 @@ class ChatViewModel : ViewModel() {
 
     fun selectUser(user: User) {
 
+        conversationGeneration++
         isLoadingOlderMessages = false
 
         viewModelScope.launch {
@@ -286,8 +289,13 @@ class ChatViewModel : ViewModel() {
 
         val userId = currentState.selectedUser._id
         val cursor = currentState.nextCursor ?: return
+        val requestGeneration = conversationGeneration
 
         isLoadingOlderMessages = true
+
+        _conversationState.value = currentState.copy(
+            isLoadingOlderMessages = true
+        )
 
         viewModelScope.launch {
             try {
@@ -301,8 +309,8 @@ class ChatViewModel : ViewModel() {
 
                     val latestState = _conversationState.value
 
-                    // Ignore the response if the user switched conversations.
                     if (
+                        requestGeneration != conversationGeneration ||
                         latestState !is ConversationUiState.Success ||
                         latestState.selectedUser._id != userId
                     ) {
@@ -326,13 +334,24 @@ class ChatViewModel : ViewModel() {
             } catch (e: Exception) {
                 // Keep existing messages; allow retry later.
             } finally {
-                isLoadingOlderMessages = false
+                if (requestGeneration == conversationGeneration) {
+                    isLoadingOlderMessages = false
+
+                    val latestState = _conversationState.value
+
+                    if (latestState is ConversationUiState.Success) {
+                        _conversationState.value = latestState.copy(
+                            isLoadingOlderMessages = false
+                        )
+                    }
+                }
             }
         }
     }
 
 
     fun closeConversation() {
+        conversationGeneration++
         isLoadingOlderMessages = false
         _conversationState.value = ConversationUiState.Idle
     }

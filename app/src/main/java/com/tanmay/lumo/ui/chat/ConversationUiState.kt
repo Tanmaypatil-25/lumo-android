@@ -13,7 +13,8 @@ sealed class ConversationUiState {
         val selectedUser: User,
         val messages: List<Message>,
         val hasMore: Boolean,
-        val nextCursor: String? = null
+        val nextCursor: String? = null,
+        val isLoadingOlderMessages: Boolean = false
     ) : ConversationUiState()
 
     data class Error(
