@@ -41,7 +41,8 @@ interface ApiService {
     @GET("api/messages/{userId}")
     suspend fun getMessages(
         @Path("userId") userId: String,
-        @Query("limit") limit: Int = 30
+        @Query("limit") limit: Int = 30,
+        @Query("before") before: String? = null
     ): Response<MessagesResponse>
 
     @POST("api/auth/signup")
