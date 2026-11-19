@@ -237,12 +237,27 @@ private fun ConversationContent(
 
         } else {
 
-            Box(
+
+            Column(
                 modifier = Modifier.weight(1f)
             ) {
+                if (isLoadingOlderMessages) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                    }
+                }
+
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(
@@ -271,17 +286,8 @@ private fun ConversationContent(
                         )
                     }
                 }
-
-                if (isLoadingOlderMessages) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .padding(top = 12.dp)
-                            .size(28.dp),
-                        strokeWidth = 2.dp
-                    )
-                }
             }
+
         }
 
         Spacer(
