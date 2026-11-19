@@ -171,10 +171,10 @@ private fun ConversationContent(
 
             if (
                 firstVisibleIndex <= 3 &&
-                hasMore &&
-                !isLoadingOlderMessages
+                currentHasMore &&
+                !currentIsLoading
             ) {
-                onLoadOlderMessages()
+                currentOnLoad()
             }
         }
     }
@@ -237,35 +237,48 @@ private fun ConversationContent(
 
         } else {
 
-            LazyColumn(
-                state = listState,
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Box(
+                modifier = Modifier.weight(1f)
             ) {
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = messages,
+                        key = { message -> message._id }
+                    ) { message ->
 
-                items(
-                    items = messages,
-                    key = { message -> message._id }
-                ) { message ->
+                        MessageItem(
+                            message = message,
+                            selectedUser = user,
+                            onEdit = {
+                                typingJob?.cancel()
+                                onStopTyping(user._id)
 
-                    MessageItem(
-                        message = message,
-                        selectedUser = user,
-                        onEdit = {
-                            typingJob?.cancel()
-                            onStopTyping(user._id)
-
-                            selectedImageUri = null
-                            editingMessageId = message._id
-                            messageText = message.text.orEmpty()
-                        },
-                        onDelete = {
-                            if (editingMessageId == message._id) {
-                                editingMessageId = null
-                                messageText = ""
+                                selectedImageUri = null
+                                editingMessageId = message._id
+                                messageText = message.text.orEmpty()
+                            },
+                            onDelete = {
+                                if (editingMessageId == message._id) {
+                                    editingMessageId = null
+                                    messageText = ""
+                                }
+                                onDeleteMessage(message._id)
                             }
-                            onDeleteMessage(message._id)
-                        }
+                        )
+                    }
+                }
+
+                if (isLoadingOlderMessages) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .padding(top = 12.dp)
+                            .size(28.dp),
+                        strokeWidth = 2.dp
                     )
                 }
             }
